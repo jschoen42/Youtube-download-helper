@@ -2,9 +2,11 @@
     PUBLIC:
     remove_colors(text: str) -> str:
 
+    @timeit(pre_text: str, repeat: int = 1)
+
     class Trace:
 
-        Trace.set(appl_folder="/trace/", debug_mode=False, reduced_mode=False, show_timestamp=True, time_zone='')
+        Trace.set(appl_folder="/trace/", debug_mode=False, reduced_mode=False, show_timestamp=True, time_zone="")
 
         Trace.start(["action", "result", "warning", "error"], csv=False) # csv with TAB instead of comma
         Trace.end("./logs", "testTrace")
@@ -24,9 +26,9 @@
         Trace.debug()    # only in debug mode
         Trace.wait()     # only in debug mode
 
-  class ProcessLog (array cache)
-    - add
-    - get
+    class ProcessLog (array cache)
+        - add
+        - get
 
 """
 
@@ -34,15 +36,17 @@ import sys
 import os
 import re
 import inspect
+import time
 
 from typing import Any
 from enum import StrEnum
 from pathlib import Path
 from datetime import datetime
+from zoneinfo import ZoneInfo
+from zoneinfo._common import ZoneInfoNotFoundError
 
-from pytz import timezone
-
-#DEFAULT_TIMEZONE = "UTC"
+# force tomezone available, if "tzdata" is installed
+# DEFAULT_TIMEZONE = "UTC"
 DEFAULT_TIMEZONE = "Europe/Berlin"
 
 # https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
@@ -75,9 +79,32 @@ class Color(StrEnum):
 def remove_colors(text: str) -> str:
     return re.sub(r"\033\[[0-9;]*m", "", text)
 
+def timeit(pre_text:str = "", repeat:int = 1):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            start_time = time.perf_counter()
+
+            result = func(*args, **kwargs)
+
+            end_time = time.perf_counter()
+            total_time = (end_time - start_time) / repeat
+
+            text = f"{Color.GREEN}{Color.BOLD}{total_time:.3f} sec{Color.RESET}"
+            if pre_text == "":
+                Trace.time(f"{text}")
+            else:
+                Trace.time(f"{pre_text}: {text}")
+
+            return result
+        return wrapper
+    return decorator
+
 pattern = {
+    "clear":     "     ", # only internal
+
     "action":    " >>> ",
     "result":    " ==> ",
+    "time":      " --> ",
 
     "empty":     "-----", # no text
     "info":      "-----",
@@ -136,7 +163,12 @@ class Trace:
         for message in Trace.messages:
             text += message + "\n"
 
-        curr_time = datetime.now(timezone(cls.settings["time_zone"])).strftime("%Y-%d-%m_%H-%M-%S")
+        try:
+            timezone = ZoneInfo(cls.settings["time_zone"])
+            curr_time = datetime.now().astimezone(timezone).strftime("%Y-%d-%m_%H-%M-%S")[:-3]
+        except ZoneInfoNotFoundError:
+            curr_time = datetime.now().strftime("%Y-%d-%m_%H-%M-%S")[:-3] # "tzdata" not installed
+
         try:
             if not trace_path.is_dir():
                 os.makedirs(path)
@@ -159,6 +191,11 @@ class Trace:
     @classmethod
     def result(cls, message: str, *optional: Any) -> None:
         pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
+        cls.__show_message(cls.__check_file_output(), pre, message, *optional)
+
+    @classmethod
+    def time(cls, message: str, *optional: Any) -> None:
+        pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_custom_caller('duration')}"
         cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
@@ -246,7 +283,17 @@ class Trace:
     @classmethod
     def __get_time(cls) -> str:
         if cls.settings["show_timestamp"]:
-            return f"{Color.BLACK}{datetime.now(timezone(cls.settings['time_zone'])).strftime('%H:%M:%S.%f')[:-3]}{Color.RESET}\t"
+            try:
+                timezone = ZoneInfo(cls.settings["time_zone"])
+                curr_time = datetime.now().astimezone(timezone).strftime("%H:%M:%S.%f")[:-3]
+                return f"{Color.BLUE}{curr_time}{Color.RESET}\t"
+
+            # "tzdata" not installed
+
+            except ZoneInfoNotFoundError:
+                curr_time = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+                return f"{Color.BLACK}{curr_time}{Color.RESET}\t"
+
         return ""
 
     @classmethod
@@ -268,6 +315,13 @@ class Trace:
             return f"\t{Color.BLUE}[{path}:{lineno} » {caller}]{Color.RESET}\t"
 
     @classmethod
+    def __get_custom_caller(cls, text) -> str:
+        if cls.settings["show_caller"] is False:
+            return f"{Color.RESET} "
+
+        return f"\t{Color.BLUE}[{text}]{Color.RESET}\t"
+
+    @classmethod
     def __check_file_output(cls) -> bool:
         trace_type = inspect.currentframe().f_back.f_code.co_name
         return trace_type in list(cls.pattern)
@@ -278,7 +332,7 @@ class Trace:
         if trace_type in pattern:
             return pattern[trace_type]
         else:
-            return "     "
+            return pattern["clear"]
 
 #######################
 
@@ -291,3 +345,19 @@ class ProcessLog:
 
     def get(self):
         return self.log
+
+""" locale
+
+    locale.setlocale(locale.LC_NUMERIC, "de_DE")
+
+
+    locale.setlocale(locale.LC_ALL, "de_DE")
+    locale.localeconv()
+
+    "en_GB": {'int_curr_symbol': 'GBP', 'currency_symbol': '£',   'mon_decimal_point': '.', 'mon_thousands_sep': ',', 'mon_grouping': [3, 0], 'positive_sign': '', 'negative_sign': '-', 'int_frac_digits': 2, 'frac_digits': 2, 'p_cs_precedes': 1, 'p_sep_by_space': 0, 'n_cs_precedes': 1, 'n_sep_by_space': 0, 'p_sign_posn': 3, 'n_sign_posn': 3, 'decimal_point': '.', 'thousands_sep': ',', 'grouping': [3, 0]}
+    "en_US": {'int_curr_symbol': 'USD', 'currency_symbol': '$',   'mon_decimal_point': '.', 'mon_thousands_sep': ',', 'mon_grouping': [3, 0], 'positive_sign': '', 'negative_sign': '-', 'int_frac_digits': 2, 'frac_digits': 2, 'p_cs_precedes': 1, 'p_sep_by_space': 0, 'n_cs_precedes': 1, 'n_sep_by_space': 0, 'p_sign_posn': 3, 'n_sign_posn': 0, 'decimal_point': '.', 'thousands_sep': ',', 'grouping': [3, 0]}
+
+    "de_DE": {'int_curr_symbol': 'EUR', 'currency_symbol': '€',   'mon_decimal_point': ',', 'mon_thousands_sep': '.', 'mon_grouping': [3, 0], 'positive_sign': '', 'negative_sign': '-', 'int_frac_digits': 2, 'frac_digits': 2, 'p_cs_precedes': 0, 'p_sep_by_space': 1, 'n_cs_precedes': 0, 'n_sep_by_space': 1, 'p_sign_posn': 1, 'n_sign_posn': 1, 'decimal_point': ',', 'thousands_sep': '.', 'grouping': [3, 0]}
+    "de_CH": {'int_curr_symbol': 'CHF', 'currency_symbol': 'CHF', 'mon_decimal_point': '.', 'mon_thousands_sep': '’', 'mon_grouping': [3, 0], 'positive_sign': '', 'negative_sign': '-', 'int_frac_digits': 2, 'frac_digits': 2, 'p_cs_precedes': 1, 'p_sep_by_space': 1, 'n_cs_precedes': 1, 'n_sep_by_space': 0, 'p_sign_posn': 4, 'n_sign_posn': 4, 'decimal_point': '.', 'thousands_sep': '’', 'grouping': [3, 0]}
+
+"""

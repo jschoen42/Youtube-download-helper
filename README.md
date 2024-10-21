@@ -5,7 +5,6 @@ requirements
 
 ``` python
  yt-dlp
- pytz #  Trace
 ```
 
 venv with special Python version (powershell)
