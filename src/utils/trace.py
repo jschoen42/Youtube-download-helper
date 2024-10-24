@@ -2,7 +2,9 @@
     PUBLIC:
     remove_colors(text: str) -> str:
 
-    @timeit(pre_text: str, repeat: int = 1)
+    @timeit(pre_text: str = "", rounds: int = 1)
+
+    @timeit("argon2 (20 rounds)", 20) # test with 20 rounds => average duration for a round
 
     class Trace:
 
@@ -79,7 +81,9 @@ class Color(StrEnum):
 def remove_colors(text: str) -> str:
     return re.sub(r"\033\[[0-9;]*m", "", text)
 
-def timeit(pre_text:str = "", repeat:int = 1):
+# decorator for time measure
+
+def timeit(pre_text:str = "", rounds:int = 1):
     def decorator(func):
         def wrapper(*args, **kwargs):
             start_time = time.perf_counter()
@@ -87,7 +91,7 @@ def timeit(pre_text:str = "", repeat:int = 1):
             result = func(*args, **kwargs)
 
             end_time = time.perf_counter()
-            total_time = (end_time - start_time) / repeat
+            total_time = (end_time - start_time) / rounds
 
             text = f"{Color.GREEN}{Color.BOLD}{total_time:.3f} sec{Color.RESET}"
             if pre_text == "":

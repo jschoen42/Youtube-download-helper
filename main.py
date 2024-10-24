@@ -24,11 +24,11 @@ def main():
     Trace.action(f"Python version {sys.version}")
     Trace.info(f"Arguments: {args}")
 
-    yt_id = ("-" + args['id'])[-11:]
+    yt_id = ("-" + args["id"])[-11:]
     #if len(yt_id) != 11:
     #    Trace.fatal(f"Invalid YouTube ID: {yt_id}")
 
-    only_audio = args['only_audio']
+    only_audio = args["only_audio"]
 
     if only_audio:
         _ret = download_video( yt_id, DEST_AUDIO, True )

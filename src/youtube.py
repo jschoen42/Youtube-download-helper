@@ -12,15 +12,15 @@ from src.utils.util import export_json
 def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
 
     yt_opts = {
-        'verbose': False,
-        'quiet': True,
-        'outtmpl': path + '/%(uploader)s/%(title)s.%(ext)s'
+        "verbose": False,
+        "quiet": True,
+        "outtmpl": path + "/%(uploader)s/%(title)s.%(ext)s"
     }
 
     if only_audio:
         tracks = "audio"
-        yt_opts['extract_audio'] = True
-        yt_opts['format'] = 'm4a' # 'bestaudio'
+        yt_opts["extract_audio"] = True
+        yt_opts["format"] = "m4a" # 'bestaudio'
     else:
         tracks = "video/audio"
 
@@ -34,9 +34,9 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
         with yt_dlp.YoutubeDL(yt_opts) as ydl:
             Trace.info(f"get title '{video_id}'")
             info = ydl.extract_info(video_url, download=False)
-            title = info['title']
-            channel = info['channel']
-            timestamp = info['timestamp']
+            title = info["title"]
+            channel = info["channel"]
+            timestamp = info["timestamp"]
 
         export_json( Path(path, get_valid_filename(channel)), get_valid_filename(title) + ".json", info, timestamp = timestamp )
 
