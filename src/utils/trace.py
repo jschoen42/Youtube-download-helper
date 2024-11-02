@@ -1,4 +1,6 @@
 """
+    (c) Jürgen Schoenemeyer, 02.11.2024
+
     PUBLIC:
     remove_colors(text: str) -> str:
 
@@ -9,13 +11,13 @@
     class Trace:
 
         Trace.set(appl_folder="/trace/", debug_mode=False, reduced_mode=False, show_timestamp=True, time_zone="")
+        Trace.set(color=False)
 
-        Trace.start(["action", "result", "warning", "error"], csv=False) # csv with TAB instead of comma
-        Trace.end("./logs", "testTrace")
+        Trace.file_init(["action", "result", "warning", "error"], csv=False) # csv with TAB instead of comma
+        Trace.file_save("./logs", "testTrace")
 
         Trace.action()
         Trace.result()
-        Trace.empty()    # not in reduced mode
         Trace.info()     # not in reduced mode
         Trace.update()   # not in reduced mode
         Trace.download() # not in reduced mode
@@ -34,6 +36,7 @@
 
 """
 
+import platform
 import sys
 import os
 import re
@@ -46,6 +49,13 @@ from pathlib import Path
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from zoneinfo._common import ZoneInfoNotFoundError
+
+system = platform.system()
+if system == "Windows":
+    import msvcrt
+else:
+    import tty
+    import termios
 
 # force tomezone available, if "tzdata" is installed
 # DEFAULT_TIMEZONE = "UTC"
@@ -70,6 +80,7 @@ class Color(StrEnum):
     BLUE          = "\033[34m"
     PURPLE        = "\033[35m"
     CYAN          = "\033[36m"
+    GREY          = "\033[37m"
 
     BLACK_BG      = "\033[40m"
     RED_BG        = "\033[41m"
@@ -77,6 +88,7 @@ class Color(StrEnum):
     BLUE_BG       = "\033[44m"
     PURPLE_BG     = "\033[45m"
     CYAN_BG       = "\033[46m"
+    GREY_BG       = "\033[47m"
 
 def remove_colors(text: str) -> str:
     return re.sub(r"\033\[[0-9;]*m", "", text)
@@ -110,7 +122,6 @@ pattern = {
     "result":    " ==> ",
     "time":      " --> ",
 
-    "empty":     "-----", # no text
     "info":      "-----",
     "update":    "+++++",
     "download":  ">>>>>",
@@ -130,6 +141,7 @@ class Trace:
     settings = {
         "appl_folder":   "/" + default_base_folder + "/",
 
+        "color":          True,
         "reduced_mode":   False,
         "debug_mode":     False,
 
@@ -169,9 +181,9 @@ class Trace:
 
         try:
             timezone = ZoneInfo(cls.settings["time_zone"])
-            curr_time = datetime.now().astimezone(timezone).strftime("%Y-%d-%m_%H-%M-%S")[:-3]
+            curr_time = datetime.now().astimezone(timezone).strftime("%Y-%d-%m_%H-%M-%S")
         except ZoneInfoNotFoundError:
-            curr_time = datetime.now().strftime("%Y-%d-%m_%H-%M-%S")[:-3] # "tzdata" not installed
+            curr_time = datetime.now().strftime("%Y-%d-%m_%H-%M-%S") # "tzdata" not installed
 
         try:
             if not trace_path.is_dir():
@@ -185,43 +197,37 @@ class Trace:
 
         cls.messages = []
 
-    # action, result, empty, info, update, download
+    # action, result, info, update, download
 
     @classmethod
-    def action(cls, message: str, *optional: Any) -> None:
+    def action(cls, message: str = "", *optional: Any) -> None:
         pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
         cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def result(cls, message: str, *optional: Any) -> None:
+    def result(cls, message: str = "", *optional: Any) -> None:
         pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
         cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def time(cls, message: str, *optional: Any) -> None:
+    def time(cls, message: str = "", *optional: Any) -> None:
         pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_custom_caller('duration')}"
         cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def empty(cls):
-        if not cls.settings["reduced_mode"]:
-            pre = f"{cls.__get_time()}{cls.__get_pattern()}"
-            cls.__show_message(cls.__check_file_output(), pre, "")
-
-    @classmethod
-    def info(cls, message: str, *optional: Any) -> None:
+    def info(cls, message: str = "", *optional: Any) -> None:
         if not cls.settings["reduced_mode"]:
             pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
             cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def update(cls, message: str, *optional: Any) -> None:
+    def update(cls, message: str = "", *optional: Any) -> None:
         if not cls.settings["reduced_mode"]:
             pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
             cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def download(cls, message: str, *optional: Any) -> None:
+    def download(cls, message: str = "", *optional: Any) -> None:
         if not cls.settings["reduced_mode"]:
             pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
             cls.__show_message(cls.__check_file_output(), pre, message, *optional)
@@ -229,22 +235,22 @@ class Trace:
     # warning, error, exception, fatal => RED
 
     @classmethod
-    def warning(cls, message: str, *optional: Any) -> None:
+    def warning(cls, message: str = "", *optional: Any) -> None:
         pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
         cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def error(cls, message: str, *optional: Any) -> None:
+    def error(cls, message: str = "", *optional: Any) -> None:
         pre = f"{cls.__get_time()}{Color.RED}{cls.__get_pattern()}{cls.__get_caller()}"
         cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def exception(cls, message: str, *optional: Any) -> None:
+    def exception(cls, message: str = "", *optional: Any) -> None:
         pre = f"{cls.__get_time()}{Color.RED}{cls.__get_pattern()}{cls.__get_caller()}"
         cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def fatal(cls, message: str, *optional: Any) -> None:
+    def fatal(cls, message: str = "", *optional: Any) -> None:
         pre = f"{cls.__get_time()}{Color.RED}{Color.BOLD}{cls.__get_pattern()}{cls.__get_caller()}"
         cls.__show_message(cls.__check_file_output(), pre, message, *optional)
         raise SystemExit
@@ -252,18 +258,35 @@ class Trace:
     # debug, wait
 
     @classmethod
-    def debug(cls, message: str, *optional: Any) -> None:
+    def debug(cls, message: str = "", *optional: Any) -> None:
         if cls.settings["debug_mode"] and not cls.settings["reduced_mode"]:
             pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
             cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def wait(cls, message: str, *optional: Any) -> None:
+    def wait(cls, message: str = "", *optional: Any) -> None:
         if cls.settings["debug_mode"]:
-            pre = f"{cls.__get_time()}{cls.__get_pattern()} {cls.__get_caller()}"
+            pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
             cls.__show_message(cls.__check_file_output(), pre, message, *optional)
             try:
-                input(f"{Color.RED}{Color.BOLD} >>> Press any key <<< {Color.RESET}")
+                print(f"{Color.RED}{Color.BOLD} >>> Press any key to continue or ESC to exit <<< {Color.RESET}", end="", flush=True)
+
+                if system == "Windows":
+                    key = msvcrt.getch()
+                    print()
+                else:
+                    fd = sys.stdin.fileno()
+                    old_settings = termios.tcgetattr(fd)
+                    try:
+                        tty.setraw(sys.stdin.fileno())
+                        key = sys.stdin.read(1)
+                    finally:
+                        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+                        print()
+
+                if key == b"\x1b":
+                    sys.exit()
+
             except KeyboardInterrupt:
                 sys.exit()
 
@@ -276,13 +299,16 @@ class Trace:
         text = f"{pre}{message}{extra}"
         text_no_tabs = text.replace("\t", " ")
 
-        if file_output: # remove all colors
+        if file_output:
             if cls.csv:
                 cls.messages.append(remove_colors(text))
             else:
                 cls.messages.append(remove_colors(text_no_tabs))
 
-        print(text_no_tabs)
+        if cls.settings["color"]:
+            print(text_no_tabs)
+        else:
+            print(remove_colors(text_no_tabs))
 
     @classmethod
     def __get_time(cls) -> str:
