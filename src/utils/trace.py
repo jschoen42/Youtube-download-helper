@@ -135,7 +135,10 @@ pattern = {
 }
 
 class Trace:
-    default_base_folder = str(Path(sys.argv[0]).parent).replace("\\", "/")
+    # default_base_folder = os.getcwd().replace("\\", "/").split("/")[-1]
+
+    default_base = Path(sys.argv[0]).parent.resolve()
+    default_base_folder = str(default_base).replace("\\", "/")
 
     settings = {
         "appl_folder":    default_base_folder + "/",
