@@ -1,5 +1,5 @@
 """
-    (c) Jürgen Schoenemeyer, 02.11.2024
+    (c) Jürgen Schoenemeyer, 06.11.2024
 
     PUBLIC:
     class Prefs:
@@ -33,20 +33,22 @@ class Prefs:
         if pref_prefix is not None:
             cls.pref_prefix = pref_prefix
         cls.data = {}
+        Trace.info(f"path '{pref_path}/{pref_prefix}'")
 
     @classmethod
     def read(cls, pref_name: str) -> bool:
         ext = Path(pref_name).suffix
         if ext not in [".yaml", ".yml"]:
-            Trace.error(f"'{ext}' not supported")
+            Trace.fatal(f"extention '{ext}' not supported")
             return False
 
         pref_name = cls.pref_prefix + pref_name
-        if not Path(cls.pref_path, pref_name).is_file():
-            Trace.error(f"pref not found '{pref_name}'")
+        pref_path = Path(cls.pref_path, pref_name)
+        if not pref_path.is_file():
+            Trace.fatal(f"'{pref_path}' not found")
             return False
         try:
-            with open( Path(cls.pref_path, pref_name), "r", encoding="utf-8") as file:
+            with open( pref_path, "r", encoding="utf-8") as file:
                 data = yaml.safe_load(file)
 
             cls.data = dict(merge_dicts(cls.data, data))

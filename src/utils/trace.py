@@ -1,5 +1,5 @@
 """
-    (c) Jürgen Schoenemeyer, 02.11.2024
+    (c) Jürgen Schoenemeyer, 13.11.2024
 
     PUBLIC:
     remove_colors(text: str) -> str:
@@ -43,7 +43,6 @@ import re
 import inspect
 import time
 
-from typing import Any
 from enum import StrEnum
 from pathlib import Path
 from datetime import datetime
@@ -95,7 +94,7 @@ def remove_colors(text: str) -> str:
 
 # decorator for time measure
 
-def timeit(pre_text:str = "", rounds:int = 1):
+def timeit(pre_text: str = "", rounds: int = 1):
     def decorator(func):
         def wrapper(*args, **kwargs):
             start_time = time.perf_counter()
@@ -131,15 +130,15 @@ pattern = {
     "exception": "!!!!!",
     "fatal":     "FATAL",
 
-    "debug":     "@@@@@",
-    "wait":      "WAIT ", # only in debug mode
+    "debug":     "@@@@@", # only in special debug mode
+    "wait":      "WAIT ", # only in special debug mode
 }
 
 class Trace:
-    default_base_folder = os.getcwd().replace("\\", "/").split("/")[-1]
+    default_base_folder = str(Path(sys.argv[0]).parent).replace("\\", "/")
 
     settings = {
-        "appl_folder":   "/" + default_base_folder + "/",
+        "appl_folder":    default_base_folder + "/",
 
         "color":          True,
         "reduced_mode":   False,
@@ -200,34 +199,34 @@ class Trace:
     # action, result, info, update, download
 
     @classmethod
-    def action(cls, message: str = "", *optional: Any) -> None:
+    def action(cls, message: str = "", *optional: any) -> None:
         pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
         cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def result(cls, message: str = "", *optional: Any) -> None:
+    def result(cls, message: str = "", *optional: any) -> None:
         pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
         cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def time(cls, message: str = "", *optional: Any) -> None:
+    def time(cls, message: str = "", *optional: any) -> None:
         pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_custom_caller('duration')}"
         cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def info(cls, message: str = "", *optional: Any) -> None:
+    def info(cls, message: str = "", *optional: any) -> None:
         if not cls.settings["reduced_mode"]:
             pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
             cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def update(cls, message: str = "", *optional: Any) -> None:
+    def update(cls, message: str = "", *optional: any) -> None:
         if not cls.settings["reduced_mode"]:
             pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
             cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def download(cls, message: str = "", *optional: Any) -> None:
+    def download(cls, message: str = "", *optional: any) -> None:
         if not cls.settings["reduced_mode"]:
             pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
             cls.__show_message(cls.__check_file_output(), pre, message, *optional)
@@ -235,22 +234,22 @@ class Trace:
     # warning, error, exception, fatal => RED
 
     @classmethod
-    def warning(cls, message: str = "", *optional: Any) -> None:
+    def warning(cls, message: str = "", *optional: any) -> None:
         pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
         cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def error(cls, message: str = "", *optional: Any) -> None:
+    def error(cls, message: str = "", *optional: any) -> None:
         pre = f"{cls.__get_time()}{Color.RED}{cls.__get_pattern()}{cls.__get_caller()}"
         cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def exception(cls, message: str = "", *optional: Any) -> None:
+    def exception(cls, message: str = "", *optional: any) -> None:
         pre = f"{cls.__get_time()}{Color.RED}{cls.__get_pattern()}{cls.__get_caller()}"
         cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def fatal(cls, message: str = "", *optional: Any) -> None:
+    def fatal(cls, message: str = "", *optional: any) -> None:
         pre = f"{cls.__get_time()}{Color.RED}{Color.BOLD}{cls.__get_pattern()}{cls.__get_caller()}"
         cls.__show_message(cls.__check_file_output(), pre, message, *optional)
         raise SystemExit
@@ -258,13 +257,13 @@ class Trace:
     # debug, wait
 
     @classmethod
-    def debug(cls, message: str = "", *optional: Any) -> None:
+    def debug(cls, message: str = "", *optional: any) -> None:
         if cls.settings["debug_mode"] and not cls.settings["reduced_mode"]:
             pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
             cls.__show_message(cls.__check_file_output(), pre, message, *optional)
 
     @classmethod
-    def wait(cls, message: str = "", *optional: Any) -> None:
+    def wait(cls, message: str = "", *optional: any) -> None:
         if cls.settings["debug_mode"]:
             pre = f"{cls.__get_time()}{cls.__get_pattern()}{cls.__get_caller()}"
             cls.__show_message(cls.__check_file_output(), pre, message, *optional)
@@ -291,7 +290,7 @@ class Trace:
                 sys.exit()
 
     @classmethod
-    def __show_message(cls, file_output: bool, pre: str, message: str, *optional: Any) -> None:
+    def __show_message(cls, file_output: bool, pre: str, message: str, *optional: any) -> None:
         extra = ""
         for opt in optional:
             extra += " > " + str(opt)

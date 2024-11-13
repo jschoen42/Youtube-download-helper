@@ -14,7 +14,7 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
     yt_opts = {
         "verbose": False,
         "quiet": True,
-        "outtmpl": path + "/%(uploader)s/%(title)s.%(ext)s"
+        "outtmpl": str(path) + "/%(uploader)s/%(title)s.%(ext)s"
     }
 
     if only_audio:

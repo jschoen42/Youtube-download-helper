@@ -9,14 +9,17 @@
 #  -> python main.py -- -YyWIuo-zUQ
 
 import sys
+from pathlib import Path
 
 from src.utils.trace import Trace
 
 from src.youtube import download_video
 from src.helper.argsparse import parse_arguments
 
-DEST_VIDEO = "./_video"
-DEST_AUDIO = "./_audio"
+BASE_DIR = Path(sys.argv[0]).parent
+
+DEST_VIDEO = BASE_DIR / "_video"
+DEST_AUDIO = BASE_DIR / "_audio"
 
 def main():
     args = parse_arguments()
