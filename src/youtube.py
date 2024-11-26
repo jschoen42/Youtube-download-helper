@@ -14,8 +14,12 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
     yt_opts = {
         "verbose": False,
         "quiet": True,
-        "outtmpl": str(path) + "/%(uploader)s/%(title)s.%(ext)s"
+        # "debug_printtraffic": True,
+        "outtmpl": str(path) + "/%(uploader)s/%(title)s.%(ext)s",
+        # "language": "de-DE",
     }
+
+    # -> /extractor/youtube.py:4254
 
     if only_audio:
         tracks = "audio"

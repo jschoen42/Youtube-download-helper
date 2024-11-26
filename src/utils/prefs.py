@@ -1,5 +1,5 @@
 """
-    (c) Jürgen Schoenemeyer, 06.11.2024
+    (c) Jürgen Schoenemeyer, 02.11.2024
 
     PUBLIC:
     class Prefs:
@@ -16,39 +16,34 @@ from pathlib import Path
 
 import yaml
 
-from src.utils.trace import Trace
-
-PREF_PATH = Path("./prefs")
-PREF_PREFIX = "" # "pref-"
+from src.utils.trace import Trace, BASE_PATH
 
 class Prefs:
-    pref_path   = PREF_PATH
-    pref_prefix = PREF_PREFIX
+    pref_path   = BASE_PATH / "prefs"
+    pref_prefix = ""
     data = {}
 
     @classmethod
     def init(cls, pref_path = None, pref_prefix = None ) -> None:
         if pref_path is not None:
-            cls.pref_path = Path( pref_path )
+            cls.pref_path = BASE_PATH / pref_path
         if pref_prefix is not None:
             cls.pref_prefix = pref_prefix
         cls.data = {}
-        Trace.info(f"path '{pref_path}/{pref_prefix}'")
 
     @classmethod
     def read(cls, pref_name: str) -> bool:
         ext = Path(pref_name).suffix
         if ext not in [".yaml", ".yml"]:
-            Trace.fatal(f"extention '{ext}' not supported")
+            Trace.error(f"'{ext}' not supported")
             return False
 
         pref_name = cls.pref_prefix + pref_name
-        pref_path = Path(cls.pref_path, pref_name)
-        if not pref_path.is_file():
-            Trace.fatal(f"'{pref_path}' not found")
+        if not Path(cls.pref_path, pref_name).is_file():
+            Trace.error(f"pref not found '{pref_name}'")
             return False
         try:
-            with open( pref_path, "r", encoding="utf-8") as file:
+            with open( Path(cls.pref_path, pref_name), "r", encoding="utf-8") as file:
                 data = yaml.safe_load(file)
 
             cls.data = dict(merge_dicts(cls.data, data))
@@ -85,7 +80,7 @@ class Prefs:
 
 # https://stackoverflow.com/questions/7204805/how-to-merge-dictionaries-of-dictionaries
 
-def merge_dicts(dict1: dict, dict2: dict) -> dict:
+def merge_dicts(dict1: dict, dict2: dict) -> any:
     for k in set(dict1.keys()).union(dict2.keys()):
         if k in dict1 and k in dict2:
             if isinstance(dict1[k], dict) and isinstance(dict2[k], dict):
