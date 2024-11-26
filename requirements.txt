@@ -1,4 +1,6 @@
 yt-dlp
+# tzdata
 arrow
 
-pyinstaller
+# pyinstaller
+# cx_Freeze
