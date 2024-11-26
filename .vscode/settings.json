@@ -1,5 +1,4 @@
 {
-  "explorer.compactFolders": false,
   "editor.fontSize": 12,
   "editor.insertSpaces": true,
   "files.trimTrailingWhitespace": true,
@@ -35,7 +34,6 @@
     }
   },
   "pylint.args": [
-    "--extension-pkg-whitelist=PySide6",
     // Convention
     // "--disable=C0103", // invalid-name
     "--disable=C0114", // missing-module-docstring
@@ -62,7 +60,7 @@
     "--disable=W0105", // pointless-string-statement
     "--disable=W0511", // fixme (TODO)
     "--disable=W0603", // global-statement
-    "--disable=W0611", // unused-import
+    // "--disable=W0611", // unused-import
     "--disable=W0613", // unused-argument
     "--disable=W0622", // redefined-builtin
   ],
