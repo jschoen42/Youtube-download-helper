@@ -1,4 +1,4 @@
-# .venv-3.12\Scripts\activate
+# .venv\Scripts\activate
 
 # python main.py rU5mxh5tsI0
 # python main.py -a zqgbJq3T8Qo

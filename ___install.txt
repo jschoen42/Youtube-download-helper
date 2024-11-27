@@ -40,14 +40,22 @@ uv pip install -r requirements.txt
 uv add result orjson arrow xmltodict dicttoxml
 uv remove ...
 
-uv add tzdata PyYAML arrow
-uv add openpyxl openpyxl-stubs
-uv add webvtt-py pymediainfo
 uv add torch<2.5
-uv add av<13 ctranslate2<5 huggingface_hub tokenizers<1 onnxruntime<2
 uv add openai-whisper
 uv add whisper-timestamped
 uv add spylls spacy<3.9 spacy_curated_transformers<1
+
+uv add tzdata PyYAML arrow
+uv add openpyxl openpyxl-stubs
+uv add webvtt-py pymediainfo
+
+uv add av<13 ctranslate2<5 huggingface_hub tokenizers<1 onnxruntime<2
+
+------------------ licenses  -------------------
+
+uv add pip-licenses
+pip-licenses > __licenses.txt
+uv remove pip-licenses
 
 ------------------ helper: uv -------------------
 
@@ -91,7 +99,7 @@ pip list --outdated
 ####################################################
 
 pip install pip-licenses
-pip-licenses > _licenses.txt
+pip-licenses > __licenses.txt
 pip uninstall pip-licenses
 
 ################# start with py ####################
@@ -100,6 +108,10 @@ py -3.10
 py -3.11
 py -3.12
 py -3.13
+
+##################### vscode #######################
+
+%APPDATA%\Code\User\settings.json
 
 ###################### git #########################
 

@@ -1,0 +1,7 @@
+youtube-download-helper v0.1.0
+├── arrow v1.3.0
+│   ├── python-dateutil v2.9.0.post0
+│   │   └── six v1.16.0
+│   └── types-python-dateutil v2.9.0.20241003
+├── tzdata v2024.2
+└── yt-dlp v2024.11.18

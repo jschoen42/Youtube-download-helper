@@ -9,6 +9,37 @@ from src.utils.util import export_json
 
 # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/YoutubeDL.py#L128-L278
 
+"""
+Video: 1920x1080
+399 avc1 841
+137 avc1 996
+270 avc1 1736
+
+248 vp09 1096
+614 vp09 2136
+616 vp09 3394 +++
+
+Audio
+600 Opus 35
+249 opus 51
+250 opus 69
+251 opus 121 +++
+
+599 mp4a 31
+139 mp4a 48
+140 mp4a 129 +++
+
+Dynamic range compression
+600-drc opus 35
+249-drc opus 51
+250-drc opus 69
+251-drc opus 121
+
+599-drc mp4a 31
+149-drc mp4a 48
+140-drc mp4a 129
+
+"""
 def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
 
     yt_opts = {
@@ -24,9 +55,11 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
     if only_audio:
         tracks = "audio"
         yt_opts["extract_audio"] = True
-        yt_opts["format"] = "m4a" # 'bestaudio'
+        yt_opts["format"] = "129" # mp4a
     else:
         tracks = "video/audio"
+        # yt_opts["format"] = "616+140"   # vp09 (3394) + mp4a (129) => .mp4
+        yt_opts["format"] = "616+251" # vp09 (3394) + opus (121) => .webm
 
     try:
         title = ""
