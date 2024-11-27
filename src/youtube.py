@@ -55,7 +55,7 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
     if only_audio:
         tracks = "audio"
         yt_opts["extract_audio"] = True
-        yt_opts["format"] = "129" # mp4a
+        yt_opts["format"] = "mp4" # "129" # mp4a
     else:
         tracks = "video/audio"
         # yt_opts["format"] = "616+140"   # vp09 (3394) + mp4a (129) => .mp4
