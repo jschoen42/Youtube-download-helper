@@ -1,0 +1,38 @@
+video
+  video
+    types
+      - vp09
+      - avc1
+      - av01
+
+  audio
+    types
+      - mp4a
+      - opus
+      - ec-3
+
+  video
+   - vp09
+      - 1920x1080
+        - 616
+        - 614
+        - 248
+
+   - avc1
+      - 1920x1080
+         - 270
+         - 137
+
+   - av01
+      - 1920x1080
+         - 399
+
+
+
+
+
+
+
+
+
+

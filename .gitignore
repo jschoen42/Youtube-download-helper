@@ -3,8 +3,10 @@ __pycache__/
 
 _audio/*
 _video/*
+_json/*
 !_audio/.gitkeep
 !_video/.gitkeep
+!_json/.gitkeep
 
 __build/*
 __dist/*

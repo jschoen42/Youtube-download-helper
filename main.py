@@ -12,9 +12,9 @@ import sys
 from pathlib import Path
 
 from src.utils.trace import Trace
+from src.helper.argsparse import parse_arguments
 
 from src.youtube import download_video
-from src.helper.argsparse import parse_arguments
 
 BASE_DIR = Path(sys.argv[0]).parent
 
