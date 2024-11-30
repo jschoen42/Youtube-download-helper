@@ -4,4 +4,8 @@ youtube-download-helper v0.1.0
 │   │   └── six v1.16.0
 │   └── types-python-dateutil v2.9.0.20241003
 ├── tzdata v2024.2
-└── yt-dlp v2024.11.18
+├── yt-dlp v2024.11.18
+└── rich v13.9.4 (group: dev)
+    ├── markdown-it-py v3.0.0
+    │   └── mdurl v0.1.2
+    └── pygments v2.18.0
