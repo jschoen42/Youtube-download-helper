@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 from src.utils.trace import Trace
 
-from src.analyse import analyse_json, analyse_json_all
+from src.analyse import analyse_json_all # , analyse_json
 
 BASE_DIR = Path(sys.argv[0]).parent
 

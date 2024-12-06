@@ -32,10 +32,12 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
     else:
         tracks = "video/audio"
         # yt_opts["format"] = "616+140"   # vp09 (3394) + mp4a (129) => .mp4
-        # yt_opts["format"] = "616+251" # vp09 (3394) + opus (121) => .webm
+        yt_opts["format"] = "614+251" # vp09 (3394) + opus (121) => .webm
+        ### yt_opts["format"] = "616+251" # vp09 (3394) + opus (121) => .webm
         # yt_opts["format"] = "299+251" # 4k
         # yt_opts["format"] = "248+251"
-        yt_opts["format"] = "webm+webm"
+        # yt_opts["format"] = "webm+webm"
+        yt_opts["format"] = "270+140"
     # step 1: audio/video title
 
     try:
@@ -61,7 +63,7 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
         error = err_no_color.replace("ERROR: ", "")
         return False
 
-    Trace.fatal("STOP")
+    # Trace.fatal("STOP")
 
     # step 2: audio/video download
 

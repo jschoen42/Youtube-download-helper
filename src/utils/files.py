@@ -1,5 +1,5 @@
 """
-    (c) Jürgen Schoenemeyer, 25.11.2024
+    (c) Jürgen Schoenemeyer, 03.12.2024
 
     error channel -> rustedpy/result
 
@@ -28,22 +28,26 @@ import os
 import sys
 
 from datetime import datetime
+from pathlib import Path
 
 from xml.dom import minidom
 import xml.etree.ElementTree as ET
 
-if "xmltodict" in sys.modules:
+try:
     import xmltodict
+except ModuleNotFoundError:
+    pass
 
-if "dicttoxml" in sys.modules:
-    from dicttoxml import dicttoxml
+try:
+    import dicttoxml
+except ModuleNotFoundError:
+    pass
 
-if "orjson" in sys.modules:
-    import orjson # Rust library optional
-else:
+try:
+    import orjson
+except ModuleNotFoundError:
     import json
 
-from pathlib import Path
 from result import Result, Ok, Err
 
 from src.utils.trace import Trace
@@ -253,15 +257,24 @@ def write_file(filepath: Path | str, data: any, filename_timestamp: bool = False
 
         # json -> json
 
-        if isinstance(data, dict) or isinstance(data, list):
-            if "orjson" in sys.modules:
-                text = orjson.dumps(data, option=orjson.OPT_INDENT_2).decode("utf-8")
-            else:
-                text = json.dumps(data, indent=2, ensure_ascii=False)
+        def serialize_sets(obj):
+            if isinstance(obj, set):
+                return sorted(obj)
 
+            return obj
+
+        if isinstance(data, dict) or isinstance(data, list):
+            try:
+                if "orjson" in sys.modules:
+                    text = orjson.dumps(data, default=serialize_sets, option=orjson.OPT_INDENT_2).decode("utf-8")
+                else:
+                    text = json.dumps(data, default=serialize_sets, indent=2, ensure_ascii=False)
+            except TypeError as err:
+                Trace.error(f"TypeError: {err}")
+                return Err(err)
         else:
             err = f"Type '{type(data)}' is not supported for '{suffix}'"
-            Trace.debug(err)
+            Trace.error(err)
             return Err(err)
 
     elif suffix == ".xml":
