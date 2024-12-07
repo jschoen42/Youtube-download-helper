@@ -1,5 +1,5 @@
 """
-    (c) Jürgen Schoenemeyer, 03.12.2024
+    (c) Jürgen Schoenemeyer, 06.12.2024
 
     error channel -> rustedpy/result
 
@@ -7,8 +7,10 @@
     result = get_timestamp(filepath: Path | str) -> Result[float, str]:
     result = set_timestamp(filepath: Path | str, timestamp: float) -> Result[(), str]:
 
+    result = get_files_dirs(path: str, extensions: list) -> Result[tuple[list, list], str]:
+
     result = read_file(filepath: Path | str, encoding: str="utf-8" ) -> Result[any, str]
-    result = write_file(filepath: Path | str, data: any, encoding: str="utf-8", create_dir: bool = True) -> Result[str, str]:
+    result = write_file(filepath: Path | str, data: any, encoding: str="utf-8", create_dir: bool = True, show_message: bool=True) -> Result[str, str]:
 
     from result import is_err, is_ok
 
@@ -107,6 +109,28 @@ def set_timestamp(filepath: Path | str, timestamp: int|float) -> Result[str, str
 
     return Ok("")
 
+# dir listing -> list of files and dirs
+
+def get_files_dirs(path: str, extensions: list) -> Result[tuple[list, list], str]:
+    files: list = []
+    dirs = []
+    try:
+        for filename in os.listdir(path):
+            filepath = os.path.join(path, filename)
+
+            if os.path.isfile(filepath):
+                for extention in extensions:
+                    if "." + extention in filename:
+                        files.append(filename)
+                        break
+            else:
+                dirs.append(filename)
+
+    except OSError as err:
+        Trace.error(f"{err}")
+        return Err(f"{err}")
+
+    return Ok(files, dirs)
 
 def read_file(filepath: Path | str, encoding: str="utf-8") -> Result[any, str]:
     """
@@ -201,7 +225,7 @@ def read_file(filepath: Path | str, encoding: str="utf-8") -> Result[any, str]:
         return Ok(data)
 
 
-def write_file(filepath: Path | str, data: any, filename_timestamp: bool = False, timestamp: int|float = 0, encoding: str="utf-8", newline: str="\n" , create_dir: bool = True) -> Result[str, str]:
+def write_file(filepath: Path | str, data: any, filename_timestamp: bool = False, timestamp: int|float = 0, encoding: str="utf-8", newline: str="\n", create_dir: bool = True, show_message: bool=True) -> Result[str, str]:
     """
     ### write file (text, json, xml)
 
@@ -338,7 +362,8 @@ def write_file(filepath: Path | str, data: any, filename_timestamp: bool = False
         except OSError as err:
             return Err(f"{err}")
 
-        Trace.update(f"'{filepath}' updated")
+        if show_message:
+            Trace.update(f"'{filepath}' updated")
 
     else:
         try:
@@ -347,7 +372,9 @@ def write_file(filepath: Path | str, data: any, filename_timestamp: bool = False
         except OSError as err:
             Trace.debug(f"{err}")
             return Err(f"{err}")
-        Trace.update(f"'{filepath}' created")
+
+        if show_message:
+            Trace.update(f"'{filepath}' created")
 
     # 4: optional: set file timestamp
 

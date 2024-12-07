@@ -7,7 +7,7 @@ from src.utils.util import import_json
 from src.utils.file import list_files
 
 def analyse_json_all( path: Path, language: str = "de" ):
-    files = list_files( path, "json" )
+    files, _ = list_files( path, "json" )
     for file in files:
         analyse_json( path, file, language )
 

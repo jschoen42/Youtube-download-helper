@@ -1,5 +1,5 @@
 """
-    (c) Jürgen Schoenemeyer, 03.12.2024
+    (c) Jürgen Schoenemeyer, 06.12.2024
 
     PUBLIC:
     format_subtitle( start_time: float, end_time: float, text: str, color=True ) -> str
@@ -8,7 +8,7 @@
     import_text(folderpath: Path | str, filename: Path|str, show_error: bool=True) -> str | None:
     import_json_timestamp(folderpath: Path | str, filename: str, show_error: bool=True) -> Tuple[dict | None, float | None]
     import_json(folderpath: Path | str, filename: str, show_error: bool=True) -> dict | None
-    export_text(folderpath: Path | str, filename: str, text: str, timestamp: int=0, create_new_folder: bool=True, encoding: str = "utf-8", ret_lf: bool=False) -> str | None
+    export_text(folderpath: Path | str, filename: str, text: str, timestamp: int=0, create_new_folder: bool=True, encoding: str = "utf-8", ret_lf: bool=False, show_message: bool=True) -> str | None
     export_json(folderpath: Path | str, filename: str, data: dict | list, timestamp = None) -> str | None
 
     class CacheJSON:
@@ -105,7 +105,7 @@ def import_json(folderpath: Path | str, filename: str, show_error: bool=True) ->
     else:
         return None
 
-def export_text(folderpath: Path | str, filename: str, text: str, timestamp: int=0, create_new_folder: bool=True, encoding: str = "utf-8", ret_lf: bool=False) -> str | None:
+def export_text(folderpath: Path | str, filename: str, text: str, timestamp: int=0, create_new_folder: bool=True, encoding: str = "utf-8", ret_lf: bool=False, show_message=True) -> str | None:
     folderpath = Path(folderpath)
     filepath   = Path(folderpath, filename)
 
@@ -132,10 +132,11 @@ def export_text(folderpath: Path | str, filename: str, text: str, timestamp: int
         if timestamp and timestamp != 0:
             set_modification_timestamp(filepath, timestamp)
 
-        if text_old == "":
-            Trace.update(f"created '{filepath}'")
-        else:
-            Trace.update(f"changed '{filepath}'")
+        if show_message:
+            if text_old == "":
+                Trace.update(f"created '{filepath}'")
+            else:
+                Trace.update(f"changed '{filepath}'")
 
         return str(filename)
 
