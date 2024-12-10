@@ -1,14 +1,1 @@
-yt-dlp==2024.10.22
-
-# bisher VP-9 default
-# spätere Version wählen codec av1 (wird von MS app nicht gespielt)
-#
-# gestestet mit 7hk91hDHmw0
-# - yt-dlp==2024.11.4
-# - yt-dlp==2024.11.18
-
-tzdata
-arrow
-
-# pyinstaller
-# cx_Freeze
+yt-dlp

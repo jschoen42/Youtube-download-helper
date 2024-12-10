@@ -1,14 +1,2 @@
 youtube-download-helper v0.1.0
-├── arrow v1.3.0
-│   ├── python-dateutil v2.9.0.post0
-│   │   └── six v1.17.0
-│   └── types-python-dateutil v2.9.0.20241206
-├── pillow v11.0.0
-├── pillow-avif-plugin v1.4.6
-├── six v1.17.0
-├── tzdata v2024.2
-├── yt-dlp v2024.12.3
-└── rich v13.9.4 (group: dev)
-    ├── markdown-it-py v3.0.0
-    │   └── mdurl v0.1.2
-    └── pygments v2.18.0
+└── yt-dlp v2024.12.6

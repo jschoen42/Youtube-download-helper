@@ -1,5 +1,5 @@
 """
-    (c) Jürgen Schoenemeyer, 06.12.2024
+    (c) Jürgen Schoenemeyer, 10.12.2024
 
     PUBLIC:
     get_modification_timestamp(filename: Path | str) -> float
@@ -49,7 +49,11 @@ import filecmp
 
 from os.path import isfile, isdir, join
 from pathlib import Path
-from dateutil.parser import parse
+
+try:
+    from dateutil.parser import parse
+except ImportError:
+    pass
 
 from src.utils.trace import Trace
 

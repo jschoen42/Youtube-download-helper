@@ -4,7 +4,7 @@ from pathlib import Path
 import yt_dlp
 from yt_dlp.utils import DownloadError
 
-from src.utils.trace import Trace, remove_colors
+from src.utils.trace import Trace, Color
 from src.utils.util import export_json
 
 # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/YoutubeDL.py#L128-L278
@@ -32,12 +32,15 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
     else:
         tracks = "video/audio"
         # yt_opts["format"] = "616+140"   # vp09 (3394) + mp4a (129) => .mp4
-        yt_opts["format"] = "614+251" # vp09 (3394) + opus (121) => .webm
         ### yt_opts["format"] = "616+251" # vp09 (3394) + opus (121) => .webm
         # yt_opts["format"] = "299+251" # 4k
         # yt_opts["format"] = "248+251"
         # yt_opts["format"] = "webm+webm"
-        yt_opts["format"] = "270+140"
+
+        yt_opts["format"] = "616+251" # vp09 (3394) + opus (121) => .webm
+        # yt_opts["format"] = "614+251" # vp09 (3394) + opus (121) => .webm
+        # yt_opts["format"] = "270+140"
+
     # step 1: audio/video title
 
     try:
@@ -59,7 +62,7 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
         Trace.result( f"{time.time() - start_time:.2f} sec => '{title}' ({tracks})" )
 
     except DownloadError as err:
-        err_no_color = remove_colors(str(err))
+        err_no_color = Color.clean(str(err))
         error = err_no_color.replace("ERROR: ", "")
         return False
 
@@ -76,7 +79,7 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
         return True
 
     except DownloadError as err:
-        err_no_color = remove_colors(str(err))
+        err_no_color = Color.clean(str(err))
         error = err_no_color.replace("ERROR: ", "")
 
         Trace.info(f"{error}")
