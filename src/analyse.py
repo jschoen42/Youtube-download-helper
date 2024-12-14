@@ -14,8 +14,8 @@ def analyse_json( path: Path, filename: str, language: str = "de" ) -> dict:
     if data is None:
         return
 
-    result = analyse_data( data, filename, language )
-    Trace.result( result )
+    _result = analyse_data( data, filename, language )
+    # Trace.result( result )
 
 def analyse_data( data: dict, name: str = "", language: str = "de",  ) -> dict:
 
@@ -80,8 +80,8 @@ def analyse_data( data: dict, name: str = "", language: str = "de",  ) -> dict:
             id = f"{id}-{format_collisions[id].index(lang)}"
 
         note = format.get("format_note", "" )
-        if note in ["Premium", "storyboard"]:
-            continue
+        # if note in ["Premium", "storyboard"]:
+        #     continue
 
         if "DRC" in note:
             continue

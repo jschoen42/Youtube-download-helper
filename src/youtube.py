@@ -15,8 +15,8 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
     yt_opts = {
         "verbose": False,
         "quiet": True,
-        "outtmpl": str(path) + "/%(uploader)s/%(title)s.%(ext)s",
         "force-ipv6": True,
+        # "outtmpl": str(path) + "/%(uploader)s/%(title)s.%(ext)s",
 
         # "debug_printtraffic": True,
     }
@@ -41,25 +41,41 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
 
         available_tracks = analyse_data( info, title )
         if only_audio:
-            yt_opts["extract_audio"] = True
             audio = available_tracks["audio"]["mp4a"]
             format = f"{audio}"
         else:
             video = available_tracks["video"]["vp09"]
             audio = available_tracks["audio"]["opus"]
 
-            video = available_tracks["video"]["avc1"]
-            audio = available_tracks["audio"]["opus"]
+            # video = available_tracks["video"]["avc1"]
+            # audio = available_tracks["audio"]["opus"]
+
+            # video = available_tracks["video"]["av01"]
+            # audio = available_tracks["audio"]["mp4a"]
 
             format = f"{video}+{audio}"
 
-        yt_opts["format"] = format
+        yt_opts = {
+            "extract_audio": only_audio,
+            "verbose":       False,
+            "quiet":         True,
+            "force-ipv6":    True,
+            "format":        format,
+            "outtmpl":       str(path) + f"/%(uploader)s/%(title)s ({format}).%(ext)s",
+
+            # "debug_printtraffic": True,
+        }
+
+        # yt_opts["format"] = format
+        # yt_opts["verbose"] = True
+        # yt_opts["debug_printtraffic"] = True
 
         Trace.result( f"{time.time() - start_time:.2f} sec => '{title}' ({format})" )
 
     except DownloadError as err:
         err_no_color = Color.clear(str(err))
         error = err_no_color.replace("ERROR: ", "")
+        Trace.fatal( err )
         return False
 
     # step 2: audio/video download

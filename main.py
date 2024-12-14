@@ -15,7 +15,7 @@
 import sys
 from pathlib import Path
 
-from src.utils.trace import Trace, Color
+from src.utils.trace import Trace #, Color
 from src.helper.argsparse import parse_arguments
 
 from src.youtube import download_video
