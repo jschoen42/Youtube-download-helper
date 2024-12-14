@@ -1,7 +1,5 @@
 from pathlib import Path
 
-# from rich import print
-
 from src.utils.trace import Trace
 from src.utils.util import import_json
 from src.utils.file import list_files
@@ -11,59 +9,128 @@ def analyse_json_all( path: Path, language: str = "de" ):
     for file in files:
         analyse_json( path, file, language )
 
-
-def analyse_json( path: Path, filename: str, language: str = "de" ):
-
+def analyse_json( path: Path, filename: str, language: str = "de" ) -> dict:
     data = import_json( path, filename )
     if data is None:
         return
 
-    audio = {} # mp4a, opus, ac-3, ec-3
-    video = {} # avc1, vp09, av01
+    result = analyse_data( data, filename, language )
+    Trace.result( result )
+
+def analyse_data( data: dict, name: str = "", language: str = "de",  ) -> dict:
+
+    # pass 1 - find all I
+
+
+    #   "language": "en-US",
+    #   "language_preference": 10,
+
+    #   "language": "de-DE",
+    #   "language_preference": -1,
+
+    audios = {} # mp4a, opus, ac-3, ec-3
+    videos = {} # avc1, vp09, av01
+    combined = []
 
     video_id = data["id"]
 
-    Trace.info(f"{video_id} - '{filename}'\n")
+    if name == "":
+        Trace.info(f"{video_id}'")
+    else:
+        Trace.info(f"{video_id} - '{name}'")
+
+    formats = data["formats"]
+
+    # pass 1: find all collisions of format_id
+
+    format_ids = {}
+    for format in formats:
+        id = format["format_id"]
+
+        if "language_preference" in format and format["language"]:
+        # if "language" in format and format["language"]:
+            lang = format["language"].split("-")[0]
+            lang_pref = format["language_preference"]
+
+            if id not in format_ids:
+                format_ids[id] = []
+            format_ids[id].append({lang: lang_pref})
+
+    # ToDo: Test mit mehr als zwei Sprachen, es fehlt noch das passende Video
+
+    format_collisions = {}
+    for key, value in format_ids.items():
+        if len(value) > 1:
+            # '139': [{'en': 10}, {'de': -1}] => {'139': [{'de': -1}, {'en': 10}]}
+            # format_collisions[key] = sorted(value, key=lambda x: list(x.values())[0])
+
+            # '139': [{'en': 10}, {'de': -1}] => {'139': ['de', 'en']}
+            format_collisions[key] = [list(d.keys())[0] for d in sorted(value, key=lambda x: list(x.values())[0])]
+
+    if len(format_collisions) > 0:
+        Trace.warning(f"id collisions: {format_collisions}")
+
+    # pass 2: find the highest datarate for each codec
 
     formats = data["formats"]
     for format in formats:
         id = format["format_id"]
+        if id in format_collisions:
+            lang = format["language"].split("-")[0]
+            id = f"{id}-{format_collisions[id].index(lang)}"
 
-        # Trace.error(f"format_id: {id}")
+        note = format.get("format_note", "" )
+        if note in ["Premium", "storyboard"]:
+            continue
+
+        if "DRC" in note:
+            continue
 
         acodec = format.get("acodec", "none")
         vcodec = format.get("vcodec", "none")
 
-        # Audio
+        # combined Audio + Video (-> low quality)
 
-        if acodec != "none":
+        if acodec != "none" and vcodec != "none":
+            combined.append(id)
+
+        # only Audio
+
+        elif acodec != "none":
             type = acodec.split(".")[0]
+            lang = format["language"].split("-")[0]
 
-            if type not in audio:
-                audio[type] = {}
+            if lang not in audios:
+                audios[lang] = {}
 
-            audio[type][id] = {
-                "language": format["language"],
+            if type not in audios[lang]:
+                audios[lang][type] = {}
+
+            audios[lang][type][id] = {
                 "codec":    acodec,
-                "ext":      format.get("audio_ext", ""),
+               # "ext":      format.get("audio_ext", ""),
                 "tbr":      round(format["tbr"]),
+                "quality":  round(format["quality"]),
                 "channels": format["audio_channels"],
                 "sampling": format["asr"],
                 "filesize": format.get("filesize"),
             }
 
-        # Video
+        # only Video
 
         elif vcodec != "none":
             type = vcodec.split(".")[0]
+            if type == "vp9":
+                type = "vp09"
 
-            if type not in video:
-                video[type] = {}
+            if type not in videos:
+                videos[type] = {}
 
-            video[type][id] = {
+            videos[type][id] = {
                 "codec":    vcodec,
-                "ext":      format.get("video_ext", ""),
+                # "ext":      format.get("video_ext", ""),
                 "tbr":      round(format["tbr"]),
+                "quality":  round(format["quality"]),
                 "width":    format["width"],
                 "height":   format["height"],
                 "fps":      format["fps"],
@@ -75,37 +142,57 @@ def analyse_json( path: Path, filename: str, language: str = "de" ):
         else:
             continue
 
-    # video
+    # if len(combined)>0:
+    #     Trace.warning( f"combined video + audio: {combined}\n" )
 
-    best_resolution = ""
-    max_id = -1
-    for type, group in video.items():
-        max_tbr = -1
-        for key, value in group.items():
-            if value["tbr"] > max_tbr:
-                max_tbr = value["tbr"]
-                max_id = key
-                best_resolution = f"{value["width"]}x{value["height"]}"
+    # sorted by "tbr" (total bitrate)
 
-            Trace.info(f"video: {key:<3} - codec '{value["codec"]}', {value["width"]}x{value["height"]}, tbr: {value["tbr"]}")
+    videos_sorted = {}
+    for key, value in videos.items():
+        videos_sorted[key] = dict(sorted(value.items(), key=lambda item: item[1]["tbr"]))
 
-        Trace.result( f"video {type} -> {max_id} > {max_tbr} ({best_resolution})\n" )
+    audios_sorted = {}
+    for lang, value in audios.items():
+        audios_sorted[lang] = {}
+        for key, data in audios[lang].items():
+            audios_sorted[lang][key] = dict(sorted(data.items(), key=lambda item: item[1]["tbr"]))
 
-    # audio
 
-    # Trace.fatal( audio )
+    # all video tracks
 
-    max_id = -1
-    for type, group in audio.items():
-        max_tbr =-1
-        for key, value in group.items():
-            if "-drc" not in key:
-                if language in value["language"]:
-                    if value["tbr"] > max_tbr:
-                        max_tbr = value["tbr"]
-                        max_id = key
-                    Trace.info(f"audio: {key:<3} '{value["language"]}' - codec '{value["codec"]}', {value["channels"]} channels, tbr: {value["tbr"]}")
-                else:
-                    Trace.error(f"audio: {key:<3} '{value["language"]}' - codec '{value["codec"]}', {value["channels"]} channels, tbr: {value["tbr"]}")
+    for key, value in videos_sorted.items():
+        Trace.info( f"video: {key}")
+        for type, types in value.items():
+            size = f"{types['width']}x{types['height']}"
+            Trace.info( f"id: {type:3} - tbr: {types['tbr']:4} - size: {size:9} - codec: {types['codec']}")
 
-        Trace.result(f"audio {type} -> {max_id} > {max_tbr}\n")
+    video_best = {}
+    for type, value in videos_sorted.items():
+        video_best[type] = list(value.keys())[-1]
+
+    # all audio tracks
+
+    for lang, data_lang in audios_sorted.items():
+        for key, value in data_lang.items():
+            Trace.info( f"audio: {lang} - {key}")
+            for type, types in value.items():
+                Trace.info( f"id: {type:3} - tbr: {types['tbr']:4} - codec: {types['codec']}")
+
+    if len( audios_sorted ) == 1:
+        language = list(audios_sorted.keys())[0]
+
+    audio_best = {}
+    if language not in audios_sorted:
+        Trace.error( f"language '{language}' not found" )
+    else:
+        for type, value in audios_sorted[language].items():
+            audio_best[type] = list(value.keys())[-1]
+
+    result = {
+        "language": language,
+        "video": video_best,
+        "audio": audio_best,
+    }
+    Trace.result(f"{result}")
+
+    return result

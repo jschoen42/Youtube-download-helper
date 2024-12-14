@@ -9,10 +9,13 @@
 #  -> python main.py YyWIuo-zUQ
 #  -> python main.py -- -YyWIuo-zUQ
 
+# uv run python main.py
+# uv run python main.py -a
+
 import sys
 from pathlib import Path
 
-from src.utils.trace import Trace
+from src.utils.trace import Trace, Color
 from src.helper.argsparse import parse_arguments
 
 from src.youtube import download_video
@@ -24,8 +27,6 @@ DEST_AUDIO = BASE_DIR / "_audio"
 
 def main():
     args = parse_arguments()
-
-    Trace.action(f"Python version {sys.version}")
     Trace.info(f"Arguments: {args}")
 
     yt_id = ("-" + args["id"])[-11:]
@@ -40,4 +41,5 @@ def main():
         _ret = download_video( yt_id, DEST_VIDEO, False )
 
 if __name__ == "__main__":
+    Trace.action(f"Python version {sys.version}")
     main()

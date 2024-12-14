@@ -35,7 +35,6 @@
     copy_my_file(source: str, dest: str, _show_updated: bool) -> bool
 
     convert_datetime( time_string: str ) -> int
-
 """
 
 import shutil

@@ -6,42 +6,22 @@ from yt_dlp.utils import DownloadError
 
 from src.utils.trace import Trace, Color
 from src.utils.util import export_json
+from src.analyse import analyse_data
 
 # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/YoutubeDL.py#L128-L278
-
 
 def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
 
     yt_opts = {
         "verbose": False,
         "quiet": True,
-        # "debug_printtraffic": True,
         "outtmpl": str(path) + "/%(uploader)s/%(title)s.%(ext)s",
-
-        # "simulate": True,
         "force-ipv6": True,
 
+        # "debug_printtraffic": True,
     }
 
-    # -> /extractor/youtube.py:4254
-
-    if only_audio:
-        tracks = "audio"
-        yt_opts["extract_audio"] = True
-        yt_opts["format"] = "140" # "m4a"
-    else:
-        tracks = "video/audio"
-        # yt_opts["format"] = "616+140"   # vp09 (3394) + mp4a (129) => .mp4
-        ### yt_opts["format"] = "616+251" # vp09 (3394) + opus (121) => .webm
-        # yt_opts["format"] = "299+251" # 4k
-        # yt_opts["format"] = "248+251"
-        # yt_opts["format"] = "webm+webm"
-
-        yt_opts["format"] = "616+251" # vp09 (3394) + opus (121) => .webm
-        # yt_opts["format"] = "614+251" # vp09 (3394) + opus (121) => .webm
-        # yt_opts["format"] = "270+140"
-
-    # step 1: audio/video title
+    # step 1: audio/video title and available tracks
 
     try:
         title = ""
@@ -59,14 +39,28 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
 
         export_json( Path(path, get_valid_filename(channel)), get_valid_filename(title) + ".json", info, timestamp = timestamp )
 
-        Trace.result( f"{time.time() - start_time:.2f} sec => '{title}' ({tracks})" )
+        available_tracks = analyse_data( info, title )
+        if only_audio:
+            yt_opts["extract_audio"] = True
+            audio = available_tracks["audio"]["mp4a"]
+            format = f"{audio}"
+        else:
+            video = available_tracks["video"]["vp09"]
+            audio = available_tracks["audio"]["opus"]
+
+            video = available_tracks["video"]["avc1"]
+            audio = available_tracks["audio"]["opus"]
+
+            format = f"{video}+{audio}"
+
+        yt_opts["format"] = format
+
+        Trace.result( f"{time.time() - start_time:.2f} sec => '{title}' ({format})" )
 
     except DownloadError as err:
-        err_no_color = Color.clean(str(err))
+        err_no_color = Color.clear(str(err))
         error = err_no_color.replace("ERROR: ", "")
         return False
-
-    # Trace.fatal("STOP")
 
     # step 2: audio/video download
 
@@ -79,7 +73,7 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
         return True
 
     except DownloadError as err:
-        err_no_color = Color.clean(str(err))
+        err_no_color = Color.clear(str(err))
         error = err_no_color.replace("ERROR: ", "")
 
         Trace.info(f"{error}")
