@@ -15,7 +15,7 @@
 import sys
 from pathlib import Path
 
-from src.utils.trace import Trace #, Color
+from src.utils.trace import Trace, Color
 from src.helper.argsparse import parse_arguments
 
 from src.youtube import download_video
@@ -41,5 +41,7 @@ def main():
         _ret = download_video( yt_id, DEST_VIDEO, False )
 
 if __name__ == "__main__":
+    Trace.set( debug_mode=False, timezone=False )
     Trace.action(f"Python version {sys.version}")
+
     main()

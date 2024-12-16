@@ -161,10 +161,10 @@ def analyse_data( data: dict, name: str = "", language: str = "de",  ) -> dict:
     # all video tracks
 
     for key, value in videos_sorted.items():
-        Trace.info( f"video: {key}")
+        Trace.debug( f"video: {key}")
         for type, types in value.items():
             size = f"{types['width']}x{types['height']}"
-            Trace.info( f"id: {type:3} - tbr: {types['tbr']:4} - size: {size:9} - codec: {types['codec']}")
+            Trace.debug( f"id: {type:3} - tbr: {types['tbr']:4} - size: {size:9} - codec: {types['codec']}")
 
     video_best = {}
     for type, value in videos_sorted.items():
@@ -174,9 +174,9 @@ def analyse_data( data: dict, name: str = "", language: str = "de",  ) -> dict:
 
     for lang, data_lang in audios_sorted.items():
         for key, value in data_lang.items():
-            Trace.info( f"audio: {lang} - {key}")
+            Trace.debug( f"audio: {lang} - {key}")
             for type, types in value.items():
-                Trace.info( f"id: {type:3} - tbr: {types['tbr']:4} - codec: {types['codec']}")
+                Trace.debug( f"id: {type:3} - tbr: {types['tbr']:4} - codec: {types['codec']}")
 
     if len( audios_sorted ) == 1:
         language = list(audios_sorted.keys())[0]
