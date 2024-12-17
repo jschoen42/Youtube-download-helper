@@ -1,5 +1,5 @@
 """
-    (c) Jürgen Schoenemeyer, 16.12.2024
+    (c) Jürgen Schoenemeyer, 17.12.2024
 
     PUBLIC:
     class Trace:
@@ -52,8 +52,6 @@ from pathlib import Path
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from zoneinfo._common import ZoneInfoNotFoundError
-
-BASE_PATH = Path(sys.argv[0]).parent
 
 system = platform.system()
 if system == "Windows":
@@ -135,10 +133,10 @@ pattern = {
 }
 
 class Trace:
+    BASE_PATH = Path(sys.argv[0]).parent
+
     default_base = BASE_PATH.resolve()
     default_base_folder = str(default_base).replace("\\", "/")
-
-    # sys.stdout.encoding = "utf-8"
 
     settings = {
         "appl_folder":    default_base_folder + "/",

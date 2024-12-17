@@ -2,15 +2,13 @@
 # python test_analyse.py
 
 import sys
-from pathlib import Path
-from src.utils.trace import Trace
+
+from src.utils.globals import BASE_PATH
+from src.utils.trace   import Trace
 
 from src.analyse import analyse_json_all # , analyse_json
 
-BASE_DIR = Path(sys.argv[0]).parent
-
-
-DIR_JSON = BASE_DIR / "_json"
+DIR_JSON = BASE_PATH / "_json"
 
 def main():
     Trace.set(show_caller=False, show_timestamp=False)

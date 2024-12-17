@@ -13,17 +13,15 @@
 # uv run python main.py -a
 
 import sys
-from pathlib import Path
 
-from src.utils.trace import Trace, Color
+from src.utils.globals import BASE_PATH
+from src.utils.trace import Trace
 from src.helper.argsparse import parse_arguments
 
 from src.youtube import download_video
 
-BASE_DIR = Path(sys.argv[0]).parent
-
-DEST_VIDEO = BASE_DIR / "_video"
-DEST_AUDIO = BASE_DIR / "_audio"
+DEST_VIDEO = BASE_PATH / "_video"
+DEST_AUDIO = BASE_PATH / "_audio"
 
 def main():
     args = parse_arguments()

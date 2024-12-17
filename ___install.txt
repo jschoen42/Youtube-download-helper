@@ -47,6 +47,8 @@ uv pip install -r requirements.txt
 uv add result orjson arrow xmltodict dicttoxml
 uv remove ...
 
+uv add --dev ...
+
 uv add torch<2.5
 uv add openai-whisper
 uv add whisper-timestamped
@@ -112,6 +114,11 @@ python.exe -m venv .venv
 
 & 'C:\Program Files\_prog\Python313\python.exe' -m venv .venv-3.13
 .venv-3.13\Scripts\activate
+
+-------------------- Git Bash ---------------------
+
+source .venv/Scripts/activate
+deactivate
 
 ############### pip - dependencies  ###############
 
