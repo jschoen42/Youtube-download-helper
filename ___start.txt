@@ -1,0 +1,13 @@
+.venv\Scripts\activate
+
+python src/main.py
+python src/main.py rU5mxh5tsI0
+python src/main.py -a zqgbJq3T8Qo
+
+Sonderfall:
+python src/main.py -YyWIuo-zUQ
+ -> python src/main.py YyWIuo-zUQ
+ -> python src/main.py -- -YyWIuo-zUQ
+
+uv run python src/main.py
+uv run python src/main.py -a

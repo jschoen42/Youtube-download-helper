@@ -1,14 +1,15 @@
-result/*
-!result/.gitkeep
-
 data/*
 !data/.gitkeep
 
-_audio/*
-_video/*
+result/*
+!result/.gitkeep
+
+result/audio/*
+result/video/*
+!result/audio/.gitkeep
+!result/video/.gitkeep
+
 _json/*
-!_audio/.gitkeep
-!_video/.gitkeep
 !_json/.gitkeep
 
 ### Python

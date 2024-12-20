@@ -4,9 +4,10 @@ from pathlib import Path
 import yt_dlp
 from yt_dlp.utils import DownloadError
 
-from src.utils.trace import Trace, Color
-from src.utils.util import export_json
-from src.analyse import analyse_data
+from utils.trace import Trace, Color
+from utils.util  import export_json
+
+from helper.analyse import analyse_data
 
 # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/YoutubeDL.py#L128-L278
 
