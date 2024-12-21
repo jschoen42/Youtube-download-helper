@@ -4,6 +4,8 @@ from utils.trace import Trace
 from utils.util  import import_json
 from utils.file  import list_files
 
+# yt-dlp https://www.youtube.com/watch?v=37SpumiGHgE --list-formats
+
 def analyse_json_all( path: Path, language: str = "de" ):
     files, _ = list_files( path, "json" )
     for file in files:
@@ -23,14 +25,16 @@ def analyse_data( data: dict, name: str = "", language: str = "de",  ) -> dict:
 
 
     #   "language": "en-US",
-    #   "language_preference": 10,
+    #   "format_note": "American English - original (default)",
 
     #   "language": "de-DE",
-    #   "language_preference": -1,
+    #   "format_note": "German (Germany) original, low",
 
     audios = {} # mp4a, opus, ac-3, ec-3
     videos = {} # avc1, vp09, av01
     combined = []
+
+    original_language = None
 
     video_id = data["id"]
 
@@ -41,47 +45,13 @@ def analyse_data( data: dict, name: str = "", language: str = "de",  ) -> dict:
 
     formats = data["formats"]
 
-    # pass 1: find all collisions of format_id
-
-    format_ids = {}
-    for format in formats:
-        id = format["format_id"]
-
-        if "language_preference" in format and format["language"]:
-        # if "language" in format and format["language"]:
-            lang = format["language"].split("-")[0]
-            lang_pref = format["language_preference"]
-
-            if id not in format_ids:
-                format_ids[id] = []
-            format_ids[id].append({lang: lang_pref})
-
-    # ToDo: Test mit mehr als zwei Sprachen, es fehlt noch das passende Video
-
-    format_collisions = {}
-    for key, value in format_ids.items():
-        if len(value) > 1:
-            # '139': [{'en': 10}, {'de': -1}] => {'139': [{'de': -1}, {'en': 10}]}
-            # format_collisions[key] = sorted(value, key=lambda x: list(x.values())[0])
-
-            # '139': [{'en': 10}, {'de': -1}] => {'139': ['de', 'en']}
-            format_collisions[key] = [list(d.keys())[0] for d in sorted(value, key=lambda x: list(x.values())[0])]
-
-    if len(format_collisions) > 0:
-        Trace.warning(f"id collisions: {format_collisions}")
-
-    # pass 2: find the highest datarate for each codec
+    # find the highest datarate for each codec
 
     formats = data["formats"]
     for format in formats:
         id = format["format_id"]
-        if id in format_collisions:
-            lang = format["language"].split("-")[0]
-            id = f"{id}-{format_collisions[id].index(lang)}"
 
         note = format.get("format_note", "" )
-        # if note in ["Premium", "storyboard"]:
-        #     continue
 
         if "DRC" in note:
             continue
@@ -108,13 +78,15 @@ def analyse_data( data: dict, name: str = "", language: str = "de",  ) -> dict:
 
             audios[lang][type][id] = {
                 "codec":    acodec,
-               # "ext":      format.get("audio_ext", ""),
                 "tbr":      round(format["tbr"]),
                 "quality":  round(format["quality"]),
                 "channels": format["audio_channels"],
                 "sampling": format["asr"],
                 "filesize": format.get("filesize"),
             }
+
+            if "original" in note:
+                original_language = lang
 
         # only Video
 
@@ -180,6 +152,8 @@ def analyse_data( data: dict, name: str = "", language: str = "de",  ) -> dict:
 
     if len( audios_sorted ) == 1:
         language = list(audios_sorted.keys())[0]
+    elif original_language:
+        language = original_language
 
     audio_best = {}
     if language not in audios_sorted:
