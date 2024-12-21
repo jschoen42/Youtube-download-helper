@@ -1,5 +1,5 @@
-# .venv\Scripts\activate
-# python test_analyse.py
+# .venv/Scripts/activate
+# python src/analyse.py
 
 import sys
 
@@ -19,5 +19,6 @@ def main():
     analyse_json_all( DIR_JSON, "de")
 
 if __name__ == "__main__":
+    Trace.set( debug_mode=True, timezone=False )
     Trace.action(f"Python version {sys.version}")
     main()

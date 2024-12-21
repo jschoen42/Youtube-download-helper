@@ -33,12 +33,13 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
         start_time = time.time()
         with yt_dlp.YoutubeDL(yt_opts) as ydl:
             Trace.info(f"get title '{video_id}'")
-            info = ydl.extract_info(video_url, download=False, process=False)
+            info = ydl.extract_info(video_url, download=False)
+
             title = info["title"]
             channel = info["channel"]
             timestamp = info["timestamp"]
 
-        export_json( Path(path, get_valid_filename(channel)), get_valid_filename(title) + ".json", info, timestamp = timestamp )
+        export_json( Path(path, get_valid_filename(channel)), get_valid_filename(title) + ".json", ydl.sanitize_info(info), timestamp = timestamp )
 
         available_tracks = analyse_data( info, title )
         if only_audio:

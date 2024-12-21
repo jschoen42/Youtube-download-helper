@@ -1,10 +1,10 @@
 """
-    © Jürgen Schoenemeyer, 20.12.2024
+    © Jürgen Schoenemeyer, 21.12.2024
 
     PUBLIC:
     class Prefs:
       - init(cls, pref_path = None, pref_prefix = None ) -> None
-      - read(cls, pref_name: str) -> bool
+      - load(cls, pref_name: str) -> bool
       - get(cls, key_path: str) -> Any
 
     merge_dicts(a: dict, b: dict) -> dict
@@ -38,7 +38,7 @@ class Prefs:
         cls.data = {}
 
     @classmethod
-    def read(cls, pref_name: str) -> bool:
+    def load(cls, pref_name: str) -> bool:
         ext = Path(pref_name).suffix
         if ext not in [".yaml", ".yml"]:
             Trace.error(f"'{ext}' not supported")
@@ -46,7 +46,7 @@ class Prefs:
 
         pref_name = cls.pref_prefix + pref_name
         if not Path(cls.pref_path, pref_name).is_file():
-            Trace.error(f"pref not found '{pref_name}'")
+            Trace.error(f"pref not found '{cls.pref_path}\\{pref_name}'")
             return False
         try:
             with open( Path(cls.pref_path, pref_name), "r", encoding="utf-8") as file:

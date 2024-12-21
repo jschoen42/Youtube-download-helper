@@ -39,6 +39,7 @@ def main():
 if __name__ == "__main__":
     Trace.set( debug_mode=False, timezone=False )
     Trace.action(f"Python version {sys.version}")
+    Trace.action(f"BASE_PATH: '{BASE_PATH.resolve()}'")
 
     try:
         main()

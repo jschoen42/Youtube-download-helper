@@ -1,5 +1,5 @@
 version = 1
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 
 [[package]]
 name = "youtube-download-helper"
@@ -10,16 +10,16 @@ dependencies = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "yt-dlp", specifier = ">=2024.12.6" }]
+requires-dist = [{ name = "yt-dlp", specifier = "==2024.12.15.232913.dev0" }]
 
 [package.metadata.requires-dev]
 dev = []
 
 [[package]]
 name = "yt-dlp"
-version = "2024.12.6"
+version = "2024.12.15.232913.dev0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c5/5e/0b632b39b4399a4acbf1c421b0aa656fbbb3d6e4eb78af3d0b09182a8a74/yt_dlp-2024.12.6.tar.gz", hash = "sha256:743dbe081ea871be3f5ff083e2cd95da866dea773fc70ae6b109838cfbf72ac4", size = 2912236 }
+sdist = { url = "https://files.pythonhosted.org/packages/b2/aa/23c162844c21284b68bea600e4fefa9ec72c8b25e4bc5ac74f6e9f0d2d0a/yt_dlp-2024.12.15.232913.dev0.tar.gz", hash = "sha256:15cc05900fa99e60359ccc19a479348361d8fcd70e15935beb69fe00b9b4797e", size = 2914744 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e8/75/85c878fa4cbc7d0b6965f85af0f6c8f828f1adb567971e7dba099949022c/yt_dlp-2024.12.6-py3-none-any.whl", hash = "sha256:a7b8724e58fff4f3204cae4feb936dbd249ca6d22c5f25dec1b3c6f1cb7745a2", size = 3175289 },
+    { url = "https://files.pythonhosted.org/packages/54/00/53d3b4d8c94ae5592ff6053250443a6f54ecd4d8b01c6d0b1eb08c03fdc9/yt_dlp-2024.12.15.232913.dev0-py3-none-any.whl", hash = "sha256:19c2d2f4ae1430c3a3aa798bbc0939e7fd0d1cca4104e911de60cfd863825b44", size = 3176573 },
 ]
