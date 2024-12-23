@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 20.12.2024
+    © Jürgen Schoenemeyer, 21.12.2024
 
     PUBLIC:
      - @duration(pre_text: str="", rounds: int=1)
@@ -15,6 +15,7 @@ import contextlib
 import time
 import re
 import functools
+import inspect
 
 from typing import Any, Generator, Match
 from collections.abc import Callable
@@ -62,23 +63,25 @@ def my_decorator( ... ) -> Callable:
 
 def duration(pre_text: str=None, rounds: int=1) -> Callable:
     def decorator(func: Callable) -> Callable:
-        @functools.wraps(replace_arguments)
+        @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             start_time = time.perf_counter()
 
-            result = func(*args, **kwargs)
-
-            end_time = time.perf_counter()
-            total_time = (end_time - start_time) / rounds
+            args_values, kwargs_values = get_args_values( func, *args, **kwargs )
 
             if pre_text is None:
                 pretext = func.__name__
             else:
                 def replace(match: Match) -> str:
-                    return replace_arguments( match, func.__name__, *args, **kwargs )
+                    return replace_argument_values( match, func.__name__, args_values, kwargs_values )
 
                 pattern = r"\{(.*?)\}"
                 pretext = re.sub(pattern, replace, pre_text)
+
+            result = func(*args, **kwargs)
+
+            end_time = time.perf_counter()
+            total_time = (end_time - start_time) / rounds
 
             text = f"{Color.GREEN}{Color.BOLD}{total_time:.3f} sec{Color.RESET}"
             if pretext == "":
@@ -169,7 +172,6 @@ def type_check(*expected_types) -> Callable:
         return wrapper
     return decorator
 
-
 ###### decorator with ContextManager
 
 # https://www.youtube.com/watch?v=_QXlbwRmqgI&t=260s
@@ -191,25 +193,57 @@ def duration_cm(name: str) -> Generator[None, None, None]:
 
 # helper
 
-def replace_arguments(match: Match, func_name: str, *args, **kwargs) -> str:
-    argument = match.group(1)
+def get_args_values( func, *args, **kwargs ):
+    sig = inspect.signature(func)
+    bound_args = sig.bind_partial(*args, **kwargs)
+    bound_args.apply_defaults()
 
-    if argument == "__name__":
+    args_values = []
+    kwargs_values = {}
+    for name, value in bound_args.arguments.items():
+        args_values.append(value)
+        kwargs_values[name] = value
+
+    return args_values, kwargs_values
+
+def replace_argument_values(match: Match, func_name: str, args_values: list, kwargs_values: dict) -> str:
+    arguments = match.group(1)
+
+    if arguments == "__name__":
         return( func_name )
 
-    elif argument.isnumeric():
-        # args
-        pos = int(argument)
-        if pos < len(args):
-            return str(args[pos])  # {0} -> args[0]
-        else:
-            Trace.error(f"arg '{pos}' does not exist")
-            return f"<'{pos}' not exist>"
+    for argument in arguments.split("|"):
+        if argument.isnumeric():
+            # args_values: {0} -> args_values[0]
+            pos = int(argument)
+            if pos < len(args_values):
+                return str(args_values[pos])
 
-    else:
-        # kwargs
-        if argument in kwargs:
-            return str(kwargs.get(argument)) # {type} -> kwargs["type"]
         else:
-            Trace.error(f"kwarg '{argument}' does not exist")
-            return f"<'{argument}' not exist>"
+            # kwargs_values: {type} -> kwargs_values["type"]
+            if argument in kwargs_values:
+                return str(kwargs_values.get(argument))
+
+    return ""
+
+def replace_arguments(match: Match, func_name: str, *args, **kwargs) -> str:
+    arguments = match.group(1)
+
+    if arguments == "__name__":
+        return( func_name )
+
+    for argument in arguments.split("|"):
+        if argument.isnumeric():
+            # args: {0} -> args[0]
+            pos = int(argument)
+            if pos < len(args):
+                return str(args[pos])
+
+        else:
+            # kwargs: {type} -> kwargs["type"]
+            if argument in kwargs:
+                return str(kwargs.get(argument)) #
+
+    # Trace.error(f"arg/kwarg '{arguments}' does not exist")
+    # return f"'{{{arguments}}} not exist'"
+    return ""

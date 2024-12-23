@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 21.12.2024
+    © Jürgen Schoenemeyer, 22.12.2024
 
     class Trace:
       - Trace.set(debug_mode=True)
@@ -123,7 +123,7 @@ pattern = {
     "debug":     "DEBUG", # only in debug mode
     "wait":      "WAIT ", # only in debug mode
 
-    "clear":     "     ", # only internal
+    "clear":     " ••• ", # only internal
 }
 
 class Trace:

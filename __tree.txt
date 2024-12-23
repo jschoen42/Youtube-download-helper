@@ -1,2 +1,2 @@
 youtube-download-helper v0.1.0
-└── yt-dlp v2024.12.6
+└── yt-dlp v2024.12.15.232913.dev0

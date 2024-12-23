@@ -1,6 +1,6 @@
 {
   "explorer.compactFolders": false,
-  "editor.fontSize": 12,
+  "editor.fontSize": 13,
   "editor._fontFamily": "Consolas, 'Courier New', monospace",
   "editor.insertSpaces": true,
   "files.trimTrailingWhitespace": true,
