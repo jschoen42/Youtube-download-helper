@@ -6,6 +6,7 @@
   "files.trimTrailingWhitespace": true,
   "editor._autoClosingQuotes": "never",
   "editor._autoSurround": "never",
+  "terminal.integrated.minimumContrastRatio": 7,
   "[html]": {
     "editor.formatOnSave": true,
     "editor.tabSize": 2,
