@@ -1,8 +1,14 @@
-# .venv\Scripts\activate
+# pwsh: .venv/Scripts/activate
+# bash: source .venv/Scripts/activate
+# deactivate
 
 # python src/main.py
 # python src/main.py rU5mxh5tsI0
 # python src/main.py -a zqgbJq3T8Qo
+
+# uv run src/main.py
+# uv run src/main.py rU5mxh5tsI0
+# uv run src/main.py -a zqgbJq3T8Qo
 
 # Sonderfall:
 # python src/main.py -YyWIuo-zUQ

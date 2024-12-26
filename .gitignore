@@ -12,6 +12,9 @@ result/video/*
 _json/*
 !_json/.gitkeep
 
+*.7z
+__history.txt
+
 ### Python
 
 __pycache__/
