@@ -29,7 +29,7 @@ from helper.youtube import download_video
 DEST_VIDEO = BASE_PATH / "result" / "video"
 DEST_AUDIO = BASE_PATH / "result" / "audio"
 
-def main():
+def main() -> None:
     args = parse_arguments()
     Trace.info(f"Arguments: {args}")
 

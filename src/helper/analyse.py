@@ -1,3 +1,4 @@
+from typing import Dict
 from pathlib import Path
 
 from utils.trace import Trace
@@ -11,7 +12,7 @@ def analyse_json_all( path: Path, language: str = "de" ):
     for file in files:
         analyse_json( path, file, language )
 
-def analyse_json( path: Path, filename: str, language: str = "de" ) -> dict:
+def analyse_json( path: Path, filename: str, language: str = "de" ) -> Dict:
     data = import_json( path, filename )
     if data is None:
         return
@@ -19,7 +20,7 @@ def analyse_json( path: Path, filename: str, language: str = "de" ) -> dict:
     _result = analyse_data( data, filename, language )
     # Trace.result( result )
 
-def analyse_data( data: dict, name: str = "", language: str = "de",  ) -> dict:
+def analyse_data( data: Dict, name: str = "", language: str = "de",  ) -> Dict:
 
     # pass 1 - find all I
 

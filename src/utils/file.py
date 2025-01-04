@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 23.12.2024
+    © Jürgen Schoenemeyer, 04.01.2025
 
     PUBLIC:
      - get_modification_timestamp(filename: Path | str) -> float
@@ -9,28 +9,29 @@
      - check_file_exists(filepath: str, filename: str) -> bool
      - check_excel_file_exists(filename: str) -> bool
     #
-     - list_files(path: str, extensions: list) -> list
-     - list_directories(path: str) -> list
-     - listdir_match_extention(folder_path: Path | str, extensions: list=None) -> list
+     - list_files(path: str, extensions: List) -> List
+     - list_directories(path: str) -> List
+     - listdir_match_extention(folder_path: Path | str, extensions: List=None) -> List
     #
      - clear_folder(path: str) -> None
      - delete_folder_tree(dest_path: str, relax: bool = False) -> bool
      - create_folder( folderpath: Path | str ) -> bool
      - make_dir(in_path)
+     - delete_file(in_path: Path | str, filename: str) -> None
      - beautify_path( path: Path | str ) -> str
     #
      - get_trace_path(filepath: Path | str) -> str
-     - get_files_in_folder( path: Path ) -> list
-     - get_folders_in_folder( path: Path ) -> list
+     - get_files_in_folder( path: Path ) -> List
+     - get_folders_in_folder( path: Path ) -> List
      - get_save_filename( path, stem, suffix ) -> str
-     - export_binary_file(filepath: Path | str, filename: str, data: bytes, _timestamp: int=0, create_folder: bool=False) -> None
-     - export_file(filepath: Path|str, filename: str, text: str, in_type: str = None, timestamp: int=0, create_folder: bool=False, encoding: str ="utf-8", overwrite: bool=True) -> str
+     - export_binary_file(filepath: Path | str, filename: str, data: bytes, _timestamp: float=0, create_folder: bool=False) -> None
+     - export_file(filepath: Path|str, filename: str, text: str, in_type: str = None, timestamp: float=0, create_folder: bool=False, encoding: str ="utf-8", overwrite: bool=True) -> str
     #
      - get_filename_unique(dirpath: Path, filename: str) -> str
      - find_matching_file(path_name: str) -> bool | str
      - find_matching_file_path(dirname: Path, filename: str) -> Path | bool
      - get_valid_filename(name: str) -> str
-     - get_file_infos(path: Path | str, filename: str, _in_type: str) -> None | dict
+     - get_file_infos(path: Path | str, filename: str, _in_type: str) -> None | Dict
     #
      - copy_my_file(source: str, dest: str, _show_updated: bool) -> bool
     #
@@ -40,12 +41,12 @@
 import shutil
 import os
 import re
-import codecs
 import glob
 import hashlib
 import datetime
 import filecmp
 
+from typing import Dict, List, Tuple
 from os.path import isfile, isdir, join
 from pathlib import Path
 
@@ -108,10 +109,10 @@ def check_excel_file_exists(filename: Path|str) -> bool:
 
     return filename.is_file()
 
-# dir listing
+# dir Listing
 
-def list_files(path: str, extensions: list) -> tuple[list, list]:
-    files: list = []
+def list_files(path: str, extensions: List) -> Tuple[List, List]:
+    files: List = []
     dirs = []
     try:
         for filename in os.listdir(path):
@@ -130,8 +131,8 @@ def list_files(path: str, extensions: list) -> tuple[list, list]:
 
     return files, dirs
 
-def list_directories(path: str) -> list:
-    ret: list = []
+def list_directories(path: str) -> List:
+    ret: List = []
 
     try:
         for file in os.listdir(path):
@@ -142,7 +143,7 @@ def list_directories(path: str) -> list:
 
     return ret
 
-def listdir_match_extention(folder_path: Path | str, extensions: list=None) -> list:
+def listdir_match_extention(folder_path: Path | str, extensions: List | None = None) -> List:
 
     #  extensions: [".zip", ".story", ".xlsx", ".docx"], None => all
 
@@ -199,9 +200,18 @@ def create_folder( folderpath: Path | str ) -> bool:
     else:
         return False
 
-def make_dir(in_path):
+def make_dir(in_path: Path | str) -> None:
     path = Path(in_path)
     path.mkdir(parents=True, exist_ok=True)
+
+def delete_file(in_path: Path | str, filename: str) -> None:
+    path = Path(in_path) / filename
+    if path.is_file():
+        try:
+            path.unlink()
+            Trace.update(f"file '{path}/{filename}' deleted")
+        except OSError as err:
+            Trace.error(f"{err}")
 
 def beautify_path( path: Path | str ) -> str:
     return str( path ).replace("\\\\", "/")
@@ -242,10 +252,10 @@ def _increment_filename(filename_stem: str) -> str:
 
     return filename_stem
 
-def get_files_in_folder( path: Path ) -> list:
+def get_files_in_folder( path: Path ) -> List:
     return [f for f in os.listdir(path) if isfile(join(path, f))]
 
-def get_folders_in_folder( path: Path ) -> list:
+def get_folders_in_folder( path: Path ) -> List:
     return [f for f in os.listdir(path) if isdir(join(path, f))]
 
 def get_save_filename( path: Path, stem: str, suffix: str ) -> str:
@@ -267,7 +277,7 @@ def export_binary_file(filepath: Path | str, filename: str, data: bytes, _timest
         binary_file.write(data)
 
 
-def export_file(filepath: Path|str, filename: str, text: str, in_type: str = None, timestamp: float=0, create_new_folder: bool=True, encoding: str ="utf-8", overwrite: bool=True) -> str:
+def export_file(filepath: Path|str, filename: str, text: str, in_type: str | None = None, timestamp: float=0, create_new_folder: bool=True, encoding: str ="utf-8", overwrite: bool=True) -> None | str:
     trace_export_path_folder = get_trace_path(Path(filepath))
     trace_export_path        = get_trace_path(Path(filepath, filename))
 
@@ -294,7 +304,7 @@ def export_file(filepath: Path|str, filename: str, text: str, in_type: str = Non
         my_filename = dest2 + copy + "." + ext
 
     try:
-        with codecs.open(Path(filepath, my_filename), "r", encoding) as file: ###### ????
+        with open(Path(filepath, my_filename), "r", encoding=encoding) as file:
             ref_text = file.read()
     except OSError:
         ref_text = ""
@@ -306,6 +316,7 @@ def export_file(filepath: Path|str, filename: str, text: str, in_type: str = Non
             Trace.info( f"'{in_type}' not changed '{trace_export_path}'")
         else:
             Trace.info( f"not changed '{trace_export_path}'")
+
         return my_filename
 
     else:
@@ -317,9 +328,10 @@ def export_file(filepath: Path|str, filename: str, text: str, in_type: str = Non
                 except OSError as err:
                     error = str(err).split(":")[0]
                     Trace.error(f"{error}: '{trace_export_path_folder}'")
+                    return None
 
         try:
-            with codecs.open(Path(filepath, my_filename), "w", encoding) as file:
+            with open(Path(filepath, my_filename), "w", encoding=encoding) as file:
                 file.write(text)
 
             if timestamp != 0:
@@ -336,7 +348,7 @@ def export_file(filepath: Path|str, filename: str, text: str, in_type: str = Non
                 else:
                     Trace.update( f"changed '{trace_export_path}'")
 
-                return my_filename
+            return my_filename
 
         except OSError as err:
             error = str(err).split(":")[0]
@@ -382,8 +394,7 @@ def find_matching_file(path_name: str) -> bool | str:
         return False
 
     if len(s) > 1:
-        Trace.error(f"file not unique: {path_name}")
-        Trace.error(s)
+        Trace.error(f"file not unique: {path_name} - {s}")
         return False
 
     return s[0].replace("\\", "/")
@@ -398,8 +409,7 @@ def find_matching_file_path(dirpath: Path, filename: str) -> Path | bool:
         return False
 
     if len(s) > 1:
-        Trace.error(f"file not unique: {filepath}")
-        Trace.error(s)
+        Trace.error(f"file not unique: {filepath} - {s}")
         return False
 
     return Path(s[0].replace("\\", "/"))
@@ -411,7 +421,7 @@ def get_valid_filename(name: str) -> str:
     #    raise SuspiciousFileOperation("Could not derive file name from '%s'" % name)
     return s
 
-def get_file_infos(path: Path | str, filename: str, _in_type: str) -> None | dict:
+def get_file_infos(path: Path | str, filename: str, _in_type: str) -> None | Dict:
     filepath = Path(path, filename)
 
     if os.path.isfile(filepath):
@@ -458,5 +468,5 @@ def convert_datetime(time_string: str) -> int:
 
     my_timestamp = int(datetime.datetime.timestamp(my_time_string))
 
-    #print( "convert_datetime:", time_string, "->", my_time_string, " / ", my_time_string2, "=> epoch:", my_timestamp )
+    Trace.debug( f"convert_datetime: {time_string} -> {my_time_string} => epoch: {my_timestamp}" )
     return my_timestamp

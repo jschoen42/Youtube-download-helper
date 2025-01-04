@@ -12,6 +12,7 @@ from helper.analyse import analyse_data
 # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/YoutubeDL.py#L128-L278
 
 def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
+    path = Path(path)
 
     yt_opts = {
         "verbose": False,
