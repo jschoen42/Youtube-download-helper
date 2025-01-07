@@ -52,4 +52,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print()
         Trace.exception("KeyboardInterrupt")
-        sys.exit(0)
+        sys.exit()

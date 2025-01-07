@@ -1,22 +1,22 @@
 """
-    © Jürgen Schoenemeyer, 04.01.2025
+    © Jürgen Schoenemeyer, 07.01.2025
 
     PUBLIC:
      - get_modification_timestamp(filename: Path | str) -> float
      - set_modification_timestamp(filename: Path | str, timestamp: float) -> None
     #
      - check_path_exists(path: str) -> bool
-     - check_file_exists(filepath: str, filename: str) -> bool
+     - check_file_exists(filepath: Path | str, filename: str) -> bool
      - check_excel_file_exists(filename: str) -> bool
     #
-     - list_files(path: str, extensions: List) -> List
-     - list_directories(path: str) -> List
+     - list_files(path: Path | str, extensions: List) -> List
+     - list_directories(path: Path | str) -> List
      - listdir_match_extention(folder_path: Path | str, extensions: List=None) -> List
     #
      - clear_folder(path: str) -> None
-     - delete_folder_tree(dest_path: str, relax: bool = False) -> bool
+     - delete_folder_tree(dest_path: Path | str, relax: bool = False) -> bool
      - create_folder( folderpath: Path | str ) -> bool
-     - make_dir(in_path)
+     - make_dir(path: Path | str) -> None:
      - delete_file(in_path: Path | str, filename: str) -> None
      - beautify_path( path: Path | str ) -> str
     #
@@ -79,7 +79,7 @@ def set_modification_timestamp(filename: Path | str, timestamp: float) -> None:
 def check_path_exists(path: str) -> bool:
     return os.path.exists(path)
 
-def check_file_exists(filepath: Path|str, filename: str) -> bool: # case sensitive
+def check_file_exists(filepath: Path | str, filename: str) -> bool: # case sensitive
     path = Path(filepath, filename )
 
     filepath = path.parent
@@ -101,7 +101,7 @@ def check_file_exists(filepath: Path|str, filename: str) -> bool: # case sensiti
         Trace.error(f"file missing {path}")
         return False
 
-def check_excel_file_exists(filename: Path|str) -> bool:
+def check_excel_file_exists(filename: Path | str) -> bool:
     filename = Path(filename)
     if filename.suffix != ".xlsx":
         Trace.error(f"no excel file {filename}")
@@ -111,9 +111,11 @@ def check_excel_file_exists(filename: Path|str) -> bool:
 
 # dir Listing
 
-def list_files(path: str, extensions: List) -> Tuple[List, List]:
+def list_files(path: Path | str, extensions: List) -> Tuple[List, List]:
+    path = Path(path)
+
     files: List = []
-    dirs = []
+    dirs: List = []
     try:
         for filename in os.listdir(path):
             filepath = os.path.join(path, filename)
@@ -131,9 +133,10 @@ def list_files(path: str, extensions: List) -> Tuple[List, List]:
 
     return files, dirs
 
-def list_directories(path: str) -> List:
-    ret: List = []
+def list_directories(path: Path | str) -> List:
+    path = Path(path)
 
+    ret: List = []
     try:
         for file in os.listdir(path):
             if os.path.isdir(os.path.join(path, file)):
@@ -143,20 +146,23 @@ def list_directories(path: str) -> List:
 
     return ret
 
+#  extensions: [".zip", ".story", ".xlsx", ".docx"], None => all
+
 def listdir_match_extention(folder_path: Path | str, extensions: List | None = None) -> List:
+    folder_path = Path(folder_path)
 
-    #  extensions: [".zip", ".story", ".xlsx", ".docx"], None => all
-
-    ret = []
-    files = os.listdir(Path(folder_path))
+    ret: List = []
+    files = os.listdir(folder_path)
     for file in files:
-        if Path(folder_path, file).is_file():
-            if extensions is None or Path(folder_path, file).suffix in extensions:
+        if (folder_path / file).is_file():
+            if extensions is None or (folder_path / file).suffix in extensions:
                 ret.append(file)
 
     return ret
 
-def clear_folder(path: str) -> None:
+def clear_folder(path: Path | str) -> None:
+    path = Path(path)
+
     for filename in os.listdir(path):
         filepath = os.path.join(path, filename)
 
@@ -169,7 +175,9 @@ def clear_folder(path: str) -> None:
             except OSError:
                 Trace.fatal( f"shutil.rmtree {error} '{get_trace_path(filepath)}'")
 
-def delete_folder_tree(dest_path: str, relax: bool = False) -> bool:
+def delete_folder_tree(dest_path: Path | str, relax: bool = False) -> bool:
+    dest_path = Path(dest_path)
+
     ret = False
     if os.path.exists(dest_path):
         try:
@@ -200,16 +208,18 @@ def create_folder( folderpath: Path | str ) -> bool:
     else:
         return False
 
-def make_dir(in_path: Path | str) -> None:
-    path = Path(in_path)
+def make_dir(path: Path | str) -> None:
+    path = Path(path)
+
     path.mkdir(parents=True, exist_ok=True)
 
-def delete_file(in_path: Path | str, filename: str) -> None:
-    path = Path(in_path) / filename
-    if path.is_file():
+def delete_file(path: Path | str, filename: str) -> None:
+    filepath = Path(path) / filename
+
+    if filepath.is_file():
         try:
-            path.unlink()
-            Trace.update(f"file '{path}/{filename}' deleted")
+            filepath.unlink()
+            Trace.update(f"file '{filepath}' deleted")
         except OSError as err:
             Trace.error(f"{err}")
 

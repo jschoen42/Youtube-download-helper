@@ -10,7 +10,7 @@ from helper.analyse import analyse_json_all # , analyse_json
 
 DIR_JSON = BASE_PATH / "_json"
 
-def main():
+def main() -> None:
     Trace.set(show_caller=False, show_timestamp=False)
     # analyse_json( DEST_INFO_ML, "Kernfusion： Risiken, Atommüll, Endlager • SuperGAU • Radioaktivität • vAzS (109)  ｜ Josef M. Gaßner.json", "de" )
     # analyse_json( DEST_INFO_SL, "the flight that disappeared 1961.json", "en" )

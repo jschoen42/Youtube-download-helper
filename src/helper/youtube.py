@@ -1,8 +1,10 @@
 import time
+
+from typing import Dict
 from pathlib import Path
 
-import yt_dlp
-from yt_dlp.utils import DownloadError
+import yt_dlp                          # type: ignore # mypy
+from yt_dlp.utils import DownloadError # type: ignore # mypy
 
 from utils.trace import Trace, Color
 from utils.util  import export_json
@@ -14,12 +16,12 @@ from helper.analyse import analyse_data
 def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
     path = Path(path)
 
-    yt_opts = {
+    yt_opts: Dict = {
         "verbose": False,
         "quiet": True,
         "force-ipv6": True,
-        # "outtmpl": str(path) + "/%(uploader)s/%(title)s.%(ext)s",
 
+        # "outtmpl": str(path) + "/%(uploader)s/%(title)s.%(ext)s",
         # "debug_printtraffic": True,
     }
 
@@ -40,7 +42,7 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
             channel = info["channel"]
             timestamp = info["timestamp"]
 
-        export_json( Path(path, get_valid_filename(channel)), get_valid_filename(title) + ".json", ydl.sanitize_info(info), timestamp = timestamp )
+        export_json( Path(path, valid_filename(channel)), valid_filename(title) + ".json", ydl.sanitize_info(info), timestamp = timestamp )
 
         available_tracks = analyse_data( info, title )
         if only_audio:
@@ -99,17 +101,17 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
         return False
 
 
-def get_valid_filename( text ):
+def valid_filename( text: str ) -> str:
 
     convert = {
-        "<": "˂",
-        ">": "˃",
-        ":": "：",
+        "<": "˂",  # U+027C
+        ">": "˃",  # U+027D
+        ":": "：",  # U+3014
         '"': "'",
-        "/": "∕",
-        "|": "｜",
-        "?": "？",
-        "*": "˄",
+        "/": "∕",  # U+2215
+        "|": "｜",  # U+2663
+        "?": "？",  # U+3013
+        "*": "˄",  # U+02C4
 
         "\\": "_",
     }

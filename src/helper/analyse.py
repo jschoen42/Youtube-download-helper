@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 from pathlib import Path
 
 from utils.trace import Trace
@@ -7,12 +7,12 @@ from utils.file  import list_files
 
 # yt-dlp https://www.youtube.com/watch?v=37SpumiGHgE --list-formats
 
-def analyse_json_all( path: Path, language: str = "de" ):
-    files, _ = list_files( path, "json" )
+def analyse_json_all( path: Path, language: str = "de" ) -> None:
+    files, _ = list_files( path, ["json"] )
     for file in files:
         analyse_json( path, file, language )
 
-def analyse_json( path: Path, filename: str, language: str = "de" ) -> Dict:
+def analyse_json( path: Path, filename: str, language: str = "de" ) -> None:
     data = import_json( path, filename )
     if data is None:
         return
@@ -24,16 +24,15 @@ def analyse_data( data: Dict, name: str = "", language: str = "de",  ) -> Dict:
 
     # pass 1 - find all I
 
-
     #   "language": "en-US",
     #   "format_note": "American English - original (default)",
 
     #   "language": "de-DE",
     #   "format_note": "German (Germany) original, low",
 
-    audios = {} # mp4a, opus, ac-3, ec-3
-    videos = {} # avc1, vp09, av01
-    combined = []
+    audios: Dict = {} # mp4a, opus, ac-3, ec-3
+    videos: Dict = {} # avc1, vp09, av01
+    combined: List = []
 
     original_language = None
 
@@ -120,16 +119,15 @@ def analyse_data( data: Dict, name: str = "", language: str = "de",  ) -> Dict:
 
     # sorted by "tbr" (total bitrate)
 
-    videos_sorted = {}
+    videos_sorted: Dict = {}
     for key, value in videos.items():
         videos_sorted[key] = dict(sorted(value.items(), key=lambda item: item[1]["tbr"]))
 
-    audios_sorted = {}
+    audios_sorted: Dict = {}
     for lang, value in audios.items():
         audios_sorted[lang] = {}
         for key, data in audios[lang].items():
             audios_sorted[lang][key] = dict(sorted(data.items(), key=lambda item: item[1]["tbr"]))
-
 
     # all video tracks
 

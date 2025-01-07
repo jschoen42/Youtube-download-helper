@@ -15,11 +15,17 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "lxml-stubs>=0.5.1",
     "mypy>=1.14.1",
+    "lxml-stubs>=0.5.1",
     "openpyxl-stubs>=0.1.25",
-    "pandas-stubs>=2.2.3.241126",
+    "types-python-dateutil>=2.8.22",
     "types-openpyxl>=3.1.5.20241225",
     "types-pyyaml>=6.0.12.20241230",
     "types-xmltodict>=0.14.0.20241009",
 ]
+
+[tool.mypy]
+python_version = "3.13"
+mypy_path = "src"
+explicit_package_bases = true
+namespace_packages = true
