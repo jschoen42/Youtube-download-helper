@@ -68,7 +68,10 @@ def analyse_data( data: Dict, name: str = "", language: str = "de",  ) -> Dict:
 
         elif acodec != "none":
             type = acodec.split(".")[0]
-            lang = format["language"].split("-")[0]
+            if language in format:
+                lang = format["language"].split("-")[0]
+            else:
+                lang = None
 
             if lang not in audios:
                 audios[lang] = {}

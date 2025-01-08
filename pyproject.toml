@@ -10,18 +10,13 @@ readme = "README.md"
 requires-python = ">=3.13"
 
 dependencies = [
-    "yt-dlp==2024.12.23",
+    "yt-dlp>=2024.12.23",
 ]
 
 [dependency-groups]
 dev = [
     "mypy>=1.14.1",
-    "lxml-stubs>=0.5.1",
-    "openpyxl-stubs>=0.1.25",
-    "types-python-dateutil>=2.8.22",
-    "types-openpyxl>=3.1.5.20241225",
-    "types-pyyaml>=6.0.12.20241230",
-    "types-xmltodict>=0.14.0.20241009",
+    "types-python-dateutil>=2.9.0.20241206",
 ]
 
 [tool.mypy]

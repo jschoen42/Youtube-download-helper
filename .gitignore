@@ -14,6 +14,7 @@ _json/*
 
 *.7z
 __history.txt
+__mypy-result*.txt
 
 ### Python
 
