@@ -257,6 +257,7 @@ module = "faster_whisper.*"
 ignore_errors = true
 ignore_missing_imports = true
 
-python __mypy.py > __mypy-result.txt
+python __mypy.py src/main.py
+uv run __mypy.py src/main.py
 
 # type: ignore # mypy

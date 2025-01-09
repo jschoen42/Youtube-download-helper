@@ -11,3 +11,6 @@ python src/main.py -YyWIuo-zUQ
 
 uv run python src/main.py
 uv run python src/main.py -a
+
+uv run __mypy.py src/main.py
+uv run __mypy.py src/analyse.py
