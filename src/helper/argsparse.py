@@ -1,11 +1,11 @@
 # import sys
 
-from typing import Dict
+from typing import Any, Dict
 from argparse import ArgumentParser, Namespace
 
 # https://docs.python.org/3.12/howto/argparse.html#argparse-tutorial
 
-def parse_arguments() -> Dict:
+def parse_arguments() -> Dict[str, Any]:
     parser = ArgumentParser()
 
     parser.add_argument("youtube_id", help="Youtube ID - 12 charcters", type=str)

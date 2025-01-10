@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 08.01.2025
+    © Jürgen Schoenemeyer, 10.01.2025
 
     class Trace:
       - Trace.set(debug_mode=True)
@@ -139,7 +139,7 @@ class Trace:
     default_base = BASE_PATH.resolve()
     default_base_folder = str(default_base).replace("\\", "/")
 
-    settings: Dict = {
+    settings: Dict[str, Any] = {
         "appl_folder":    default_base_folder + "/",
 
         "color":          True,
@@ -152,10 +152,10 @@ class Trace:
         "show_caller":    True,
     }
 
-    pattern:list  = []
-    messages:list = []
+    pattern: List[str] = []
+    messages: List[str] = []
     csv: bool     = False
-    output: Callable | None = None
+    output: Callable[..., None] | None = None
 
     @classmethod
     def set(cls, **kwargs: Any) -> None:
@@ -184,11 +184,11 @@ class Trace:
                 print(f"trace settings: unknown parameter {key}")
 
     @classmethod
-    def redirect(cls, output: Callable) -> None:
+    def redirect(cls, output: Callable[..., None]) -> None:
         cls.output = output
 
     @classmethod
-    def file_init(cls, pattern_list: None | List = None, csv: bool = False) -> None:
+    def file_init(cls, pattern_list: None | List[str] = None, csv: bool = False) -> None:
         if pattern_list is None:
             cls.pattern = []
         else:

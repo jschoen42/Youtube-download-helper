@@ -1,4 +1,5 @@
-# python __mypy.py > __mypy-result-00.txt
+# python __mypy.py src/main.py
+# uv run __mypy.py src/main.py
 
 import sys
 import subprocess
@@ -12,17 +13,37 @@ BASE_PATH = Path(sys.argv[0]).parent.parent.resolve()
 
 def run_mypy() -> None:
 
+    # https://mypy.readthedocs.io/en/stable/command_line.html
+
     settings: List[str] = [
+        # Incremental mode
+        "--sqlite-cache",
+
+        # Untyped definitions and calls
         "--disallow-untyped-calls",
         "--disallow-untyped-defs",
-        "--disallow-incomplete-defs",
         "--disallow-untyped-decorators",
+        "--disallow-incomplete-defs",
 
+        # Configuring warnings
         "--warn-redundant-casts",
         "--warn-unused-ignores",
         "--warn-unreachable",
 
-        "--sqlite-cache",
+        # Miscellaneous strictness flags
+        "--strict-equality",
+
+        # Configuring error messages
+        # "--show-error-context"
+        "--show-column-numbers",
+        # "--show-error-end",
+        # "--show-error-code-links".
+        # "--pretty",
+        # "--force-uppercase-builtins",
+
+        # Advanced options
+        # "--show-traceback",
+        "--strict",
     ]
 
     filepath = Path(sys.argv[1]).stem

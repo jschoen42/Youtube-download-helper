@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Any, Dict, List
 from pathlib import Path
 
 from utils.trace import Trace
@@ -20,7 +20,7 @@ def analyse_json( path: Path, filename: str, language: str = "de" ) -> None:
     _result = analyse_data( data, filename, language )
     # Trace.result( result )
 
-def analyse_data( data: Dict, name: str = "", language: str = "de",  ) -> Dict:
+def analyse_data( data: Dict[str, Any], name: str = "", language: str = "de",  ) -> Dict[str, Any]:
 
     # pass 1 - find all I
 
@@ -30,9 +30,9 @@ def analyse_data( data: Dict, name: str = "", language: str = "de",  ) -> Dict:
     #   "language": "de-DE",
     #   "format_note": "German (Germany) original, low",
 
-    audios: Dict = {} # mp4a, opus, ac-3, ec-3
-    videos: Dict = {} # avc1, vp09, av01
-    combined: List = []
+    audios: Dict[str, Any] = {} # mp4a, opus, ac-3, ec-3
+    videos: Dict[str, Any] = {} # avc1, vp09, av01
+    combined: List[str] = []
 
     original_language = None
 
@@ -122,11 +122,11 @@ def analyse_data( data: Dict, name: str = "", language: str = "de",  ) -> Dict:
 
     # sorted by "tbr" (total bitrate)
 
-    videos_sorted: Dict = {}
+    videos_sorted: Dict[str, Any] = {}
     for key, value in videos.items():
         videos_sorted[key] = dict(sorted(value.items(), key=lambda item: item[1]["tbr"]))
 
-    audios_sorted: Dict = {}
+    audios_sorted: Dict[str, Any] = {}
     for lang, value in audios.items():
         audios_sorted[lang] = {}
         for key, data in audios[lang].items():

@@ -1,6 +1,6 @@
 import time
 
-from typing import Dict
+from typing import Any, Dict
 from pathlib import Path
 
 import yt_dlp                          # type: ignore # mypy
@@ -16,7 +16,7 @@ from helper.analyse import analyse_data
 def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
     path = Path(path)
 
-    yt_opts: Dict = {
+    yt_opts: Dict[str, Any] = {
         "verbose": False,
         "quiet": True,
         "force-ipv6": True,
