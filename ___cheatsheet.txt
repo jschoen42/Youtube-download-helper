@@ -22,9 +22,11 @@ UV_CACHE_DIR -> G:\.uv_cache
 
 uv cache dir
 
+echo $env:UV_CACHE_DIR
+
 -------------------- uv venv -------------------
 
-uv venv .venv -p 3.13
+uv venv .venv -p 3.13 --prompt .venv
 .venv\Scripts\activate
 deactivate
 
@@ -37,6 +39,8 @@ deactivate
 ├── hello.py
 ├── pyproject.toml
 └── uv.lock
+
+.venv/pyenv.cfg -> 'prompt = xyz' -> terminal -> (xyz)
 
 ---------- uv dependencies -> uv pip  -----------
 
@@ -253,7 +257,29 @@ module = "faster_whisper.*"
 ignore_errors = true
 ignore_missing_imports = true
 
-python __mypy.py src/main.py
-uv run __mypy.py src/main.py
+python _mypy.py src/main.py
+ -> main.py and all imported (!) files will be checked
 
-# type: ignore # mypy
+# type: ignore
+# type: ignore[attr-defined]
+
+###################### pyright ########################
+
+npm install --global pyright
+
+[tool.pyright]
+include = ["src"]
+exclude = ["**/node_modules",
+    "**/__pycache__",
+]
+pythonVersion = "3.13"
+
+python _pyright.py src/main.py
+ -> only main.py will be checked
+
+python _pyright.py src
+-> all (!) files in src will be checked
+
+python _pyright.py src/main
+python _pyright.py src/helper
+python _pyright.py src/utils

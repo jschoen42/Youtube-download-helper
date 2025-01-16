@@ -13,16 +13,16 @@ from helper.analyse import analyse_data
 
 # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/YoutubeDL.py#L128-L278
 
-def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
+def download_video(video_id: str, path: Path | str, only_audio: bool, debug: bool = False) -> bool:
     path = Path(path)
 
     yt_opts: Dict[str, Any] = {
         "verbose": False,
         "quiet": True,
         "force-ipv6": True,
+        "debug_printtraffic": debug,
 
         # "outtmpl": str(path) + "/%(uploader)s/%(title)s.%(ext)s",
-        # "debug_printtraffic": True,
     }
 
     # step 1: audio/video title and available tracks
@@ -36,13 +36,16 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
         start_time = time.time()
         with yt_dlp.YoutubeDL(yt_opts) as ydl:
             Trace.info(f"get title '{video_id}'")
+
             info = ydl.extract_info(video_url, download=False)
+            if info is None:
+                return False
 
             title = info["title"]
             channel = info["channel"]
             timestamp = info["timestamp"]
 
-        export_json( Path(path, valid_filename(channel)), valid_filename(title) + ".json", ydl.sanitize_info(info), timestamp = timestamp )
+        export_json( path / valid_filename(channel), valid_filename(title) + ".json", ydl.sanitize_info(info), timestamp = timestamp ) # type: ignore
 
         available_tracks = analyse_data( info, title )
         if only_audio:
@@ -80,7 +83,7 @@ def download_video(video_id: str, path: Path | str, only_audio: bool) -> bool:
     except DownloadError as err:
         err_no_color = Color.clear(str(err))
         error = err_no_color.replace("ERROR: ", "")
-        Trace.fatal( err )
+        Trace.fatal( f"{error}" )
         return False
 
     # step 2: audio/video download

@@ -36,11 +36,12 @@ def main() -> None:
     yt_id = ("-" + args["id"])[-11:]
 
     only_audio = args["only_audio"]
+    debug = args["debug"]
 
     if only_audio:
-        _ret = download_video( yt_id, DEST_AUDIO, True )
+        _ret = download_video( yt_id, DEST_AUDIO, True, debug )
     else:
-        _ret = download_video( yt_id, DEST_VIDEO, False )
+        _ret = download_video( yt_id, DEST_VIDEO, False, debug )
 
 if __name__ == "__main__":
     Trace.set( debug_mode=False, timezone=False )

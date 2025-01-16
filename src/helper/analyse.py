@@ -3,12 +3,12 @@ from pathlib import Path
 
 from utils.trace import Trace
 from utils.util  import import_json
-from utils.file  import list_files
+from utils.file  import listdir_match_extention
 
 # yt-dlp https://www.youtube.com/watch?v=37SpumiGHgE --list-formats
 
 def analyse_json_all( path: Path, language: str = "de" ) -> None:
-    files, _ = list_files( path, ["json"] )
+    files, _ = listdir_match_extention( path, ["json"] )
     for file in files:
         analyse_json( path, file, language )
 
@@ -71,7 +71,7 @@ def analyse_data( data: Dict[str, Any], name: str = "", language: str = "de",  )
             if language in format:
                 lang = format["language"].split("-")[0]
             else:
-                lang = None
+                lang = "unkwown"
 
             if lang not in audios:
                 audios[lang] = {}
