@@ -41,7 +41,7 @@ def download_video(video_id: str, path: Path | str, only_audio: bool, debug: boo
             if info is None:
                 return False
 
-            title = info["title"]
+            title = str(info["title"])
             channel = info["channel"]
             timestamp = info["timestamp"]
 
