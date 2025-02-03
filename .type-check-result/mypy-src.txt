@@ -1,0 +1,35 @@
+Python:   3.13.1 (main, Dec  6 2024, 18:07:41) [MSC v.1942 64 bit (AMD64)]
+Platform: Windows-11-10.0.22631-SP0
+Date:     03.02.2025 21:42:05
+Path:     G:\Python\Youtube-download-helper
+
+MyPy 1.14.1 settings:
+ --sqlite-cache
+ --explicit-package-bases
+ --namespace-packages
+ --disallow-untyped-calls
+ --disallow-untyped-defs
+ --disallow-untyped-decorators
+ --disallow-incomplete-defs
+ --warn-redundant-casts
+ --warn-unreachable
+ --force-uppercase-builtins
+ --strict-equality
+ --allow-redefinition
+
+Source files:
+ - src/__init__.py
+ - src/helper/__init__.py
+ - src/helper/analyse.py
+ - src/helper/argsparse.py
+ - src/helper/youtube.py
+ - src/utils/__init__.py
+ - src/utils/decorator.py
+ - src/utils/file.py
+ - src/utils/globals.py
+ - src/utils/trace.py
+ - src/utils/util.py
+ - src/analyse.py
+ - src/main.py
+
+Success: no issues found in 13 source files

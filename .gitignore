@@ -9,12 +9,13 @@ result/video/*
 !result/audio/.gitkeep
 !result/video/.gitkeep
 
+_old
 _json/*
 !_json/.gitkeep
 
 *.7z
 __history.txt
-.type-check-result/*
+# .type-check-result/*
 
 ### Python
 

@@ -1,0 +1,318 @@
+{
+  "scan": {
+    "date": "2025-02-03T18:43:48.783153",
+    "path": "G:/Python/Youtube-download-helper",
+    "files": 29,
+    "ignore": {
+      "folder": [
+        "__pycache__",
+        "_old",
+        ".git",
+        ".venv",
+        ".mypy_cache",
+        ".type-check-result",
+        "data",
+        "result",
+        "wav",
+        "examples"
+      ],
+      "files": [
+        ".timestamps.json",
+        "desktop.ini",
+        "folderico-*.ico"
+      ]
+    }
+  },
+  "metadata": {
+    ".gitignore": {
+      "md5": "ad2b241eb355efb211eb2939c2fc7bd4",
+      "path": "",
+      "name": ".gitignore",
+      "size": 760,
+      "attr": "A",
+      "modified": "2025-01-15 16:06:24.643254+0100",
+      "created": "2024-11-26 00:39:29.169350+0100",
+      "access": "2025-02-03 18:43:48.716253+0100"
+    },
+    ".python-version": {
+      "md5": "789ee353b44223a8ed8031aa190631dd",
+      "path": "",
+      "name": ".python-version",
+      "size": 5,
+      "attr": "A",
+      "modified": "2024-10-21 15:09:33.985639+0200",
+      "created": "2024-11-26 00:39:29.173862+0100",
+      "access": "2025-02-03 18:43:48.716253+0100"
+    },
+    ".Python313-GitHub": {
+      "md5": "d41d8cd98f00b204e9800998ecf8427e",
+      "path": "",
+      "name": ".Python313-GitHub",
+      "size": 0,
+      "attr": "A",
+      "modified": "2024-11-30 11:04:58.925792+0100",
+      "created": "2024-11-30 11:04:58.925792+0100",
+      "access": "2024-11-30 11:04:58.925792+0100"
+    },
+    ".vscode/launch.json": {
+      "md5": "56e0e9f5b753844c0891c3abb39327ef",
+      "path": ".vscode",
+      "name": "launch.json",
+      "size": 270,
+      "attr": "AI",
+      "modified": "2024-11-06 13:19:44.124773+0100",
+      "created": "2024-11-26 00:40:07.616704+0100",
+      "access": "2025-02-03 18:43:48.716253+0100"
+    },
+    ".vscode/settings.json": {
+      "md5": "7f0484790204d8b50ae8dd960aba8865",
+      "path": ".vscode",
+      "name": "settings.json",
+      "size": 2031,
+      "attr": "AI",
+      "modified": "2025-01-30 11:36:19.309112+0100",
+      "created": "2025-01-30 11:36:19.308109+0100",
+      "access": "2025-02-03 18:43:48.716253+0100"
+    },
+    "LICENSE": {
+      "md5": "43633bbc230bb0f031171b9d6e7fed00",
+      "path": "",
+      "name": "LICENSE",
+      "size": 1064,
+      "attr": "A",
+      "modified": "2024-12-29 22:06:12.764633+0100",
+      "created": "2024-12-29 22:08:08.971361+0100",
+      "access": "2025-02-03 18:43:48.716253+0100"
+    },
+    "pyproject.toml": {
+      "md5": "d0bf77b83273685c840f3958238bb183",
+      "path": "",
+      "name": "pyproject.toml",
+      "size": 524,
+      "attr": "A",
+      "modified": "2025-01-16 18:13:41.763071+0100",
+      "created": "2024-11-26 09:05:03.860040+0100",
+      "access": "2025-02-03 18:43:48.731885+0100"
+    },
+    "requirements.txt": {
+      "md5": "8e4aaee92e8e2460e23553a31ca55a32",
+      "path": "",
+      "name": "requirements.txt",
+      "size": 8,
+      "attr": "A",
+      "modified": "2024-12-10 14:39:09.047062+0100",
+      "created": "2024-11-26 00:39:29.218124+0100",
+      "access": "2025-02-03 18:43:48.731885+0100"
+    },
+    "ruff.toml": {
+      "md5": "8d90a4d239ad09f87cfdd86afb961fa9",
+      "path": "",
+      "name": "ruff.toml",
+      "size": 71,
+      "attr": "A",
+      "modified": "2024-12-04 21:58:59.993012+0100",
+      "created": "2024-11-26 00:39:29.221658+0100",
+      "access": "2025-02-03 18:43:48.734874+0100"
+    },
+    "src/analyse.py": {
+      "md5": "c82b8699ff8a4681e3a91472b3460a70",
+      "path": "src",
+      "name": "analyse.py",
+      "size": 844,
+      "attr": "A",
+      "modified": "2025-01-07 10:49:52.330435+0100",
+      "created": "2024-11-28 11:40:48.249245+0100",
+      "access": "2025-02-03 18:43:48.736385+0100"
+    },
+    "src/helper/analyse.py": {
+      "md5": "d28e7a9071f9f070d7453fd095f6ba38",
+      "path": "src/helper",
+      "name": "analyse.py",
+      "size": 5327,
+      "attr": "AI",
+      "modified": "2025-01-16 18:19:16.251538+0100",
+      "created": "2024-11-28 11:36:49.933981+0100",
+      "access": "2025-02-03 18:43:48.738401+0100"
+    },
+    "src/helper/argsparse.py": {
+      "md5": "860dc5471e912ae22484bd5faf96a257",
+      "path": "src/helper",
+      "name": "argsparse.py",
+      "size": 679,
+      "attr": "AI",
+      "modified": "2025-01-16 18:05:43.012051+0100",
+      "created": "2024-11-26 00:40:15.897417+0100",
+      "access": "2025-02-03 18:43:48.740631+0100"
+    },
+    "src/helper/youtube.py": {
+      "md5": "4241fb641a5dd8f2aaa01c93d92f5006",
+      "path": "src/helper",
+      "name": "youtube.py",
+      "size": 3723,
+      "attr": "AI",
+      "modified": "2025-01-30 11:36:19.330290+0100",
+      "created": "2025-01-30 11:36:19.330290+0100",
+      "access": "2025-02-03 18:43:48.741651+0100"
+    },
+    "src/helper/__init__.py": {
+      "md5": "d41d8cd98f00b204e9800998ecf8427e",
+      "path": "src/helper",
+      "name": "__init__.py",
+      "size": 0,
+      "attr": "AI",
+      "modified": "2024-11-07 23:41:08.479187+0100",
+      "created": "2024-11-26 00:40:15.902914+0100",
+      "access": "2024-11-26 00:40:15.902914+0100"
+    },
+    "src/main.py": {
+      "md5": "2e3f7d9d3f102bfff333efa6518887c9",
+      "path": "src",
+      "name": "main.py",
+      "size": 1426,
+      "attr": "A",
+      "modified": "2025-01-16 18:07:54.819703+0100",
+      "created": "2024-11-26 00:39:29.194013+0100",
+      "access": "2025-02-03 18:43:48.745098+0100"
+    },
+    "src/utils/decorator.py": {
+      "md5": "dbc61109d24411febaae143423b6297f",
+      "path": "src/utils",
+      "name": "decorator.py",
+      "size": 10371,
+      "attr": "AI",
+      "modified": "2025-01-30 11:36:19.330290+0100",
+      "created": "2025-01-30 11:36:19.330290+0100",
+      "access": "2025-02-03 18:43:48.747310+0100"
+    },
+    "src/utils/file.py": {
+      "md5": "40331e6e76ec21574a1bccf3608551b9",
+      "path": "src/utils",
+      "name": "file.py",
+      "size": 14154,
+      "attr": "AI",
+      "modified": "2025-01-30 11:36:19.348086+0100",
+      "created": "2025-01-30 11:36:19.348086+0100",
+      "access": "2025-02-03 18:43:48.753072+0100"
+    },
+    "src/utils/globals.py": {
+      "md5": "751cfa93af496a8c1531a19525514219",
+      "path": "src/utils",
+      "name": "globals.py",
+      "size": 563,
+      "attr": "AI",
+      "modified": "2025-01-30 11:36:19.348086+0100",
+      "created": "2025-01-30 11:36:19.348086+0100",
+      "access": "2025-02-03 18:43:48.754096+0100"
+    },
+    "src/utils/trace.py": {
+      "md5": "ce53f99ffe4b1dcf57909bfb844f3f9d",
+      "path": "src/utils",
+      "name": "trace.py",
+      "size": 15973,
+      "attr": "AI",
+      "modified": "2025-02-02 23:56:38.453645+0100",
+      "created": "2025-01-30 11:36:19.348086+0100",
+      "access": "2025-02-03 18:43:48.755093+0100"
+    },
+    "src/utils/util.py": {
+      "md5": "52a5a8ff93d17732f10f714dedba78ef",
+      "path": "src/utils",
+      "name": "util.py",
+      "size": 7166,
+      "attr": "AI",
+      "modified": "2025-02-02 22:39:29.807694+0100",
+      "created": "2025-01-30 11:36:19.364021+0100",
+      "access": "2025-02-03 18:43:48.756613+0100"
+    },
+    "src/utils/__init__.py": {
+      "md5": "d41d8cd98f00b204e9800998ecf8427e",
+      "path": "src/utils",
+      "name": "__init__.py",
+      "size": 0,
+      "attr": "AIP",
+      "modified": "2025-01-06 12:02:20.892843+0100",
+      "created": "2024-11-26 00:40:15.978843+0100",
+      "access": "2025-01-06 12:02:20.892843+0100"
+    },
+    "src/__init__.py": {
+      "md5": "d41d8cd98f00b204e9800998ecf8427e",
+      "path": "src",
+      "name": "__init__.py",
+      "size": 0,
+      "attr": "AI",
+      "modified": "2024-12-09 20:42:31.673863+0100",
+      "created": "2024-11-26 00:40:15.882844+0100",
+      "access": "2024-12-09 20:42:31.673863+0100"
+    },
+    "uv.lock": {
+      "md5": "4e9e0a9dfb28a8e84bab19136cc43cb5",
+      "path": "",
+      "name": "uv.lock",
+      "size": 7552,
+      "attr": "A",
+      "modified": "2025-01-30 11:36:19.364021+0100",
+      "created": "2025-01-30 11:36:19.364021+0100",
+      "access": "2025-02-03 18:43:48.760468+0100"
+    },
+    "_mypy.py": {
+      "md5": "2e14138b0e4070c44dedc7b1621aba07",
+      "path": "",
+      "name": "_mypy.py",
+      "size": 4821,
+      "attr": "A",
+      "modified": "2025-02-02 23:14:35.723451+0100",
+      "created": "2025-01-30 11:36:19.326719+0100",
+      "access": "2025-02-03 18:43:48.760468+0100"
+    },
+    "_pyright.py": {
+      "md5": "2d8f8094cfb7ecf951f2e4a276b3f44f",
+      "path": "",
+      "name": "_pyright.py",
+      "size": 4700,
+      "attr": "A",
+      "modified": "2025-02-02 13:05:39.808825+0100",
+      "created": "2025-01-30 11:36:19.330290+0100",
+      "access": "2025-02-03 18:43:48.760468+0100"
+    },
+    "__history.txt": {
+      "md5": "b3a87d58de7e9e8686262bf234e4f988",
+      "path": "",
+      "name": "__history.txt",
+      "size": 8414,
+      "attr": "A",
+      "modified": "2025-01-16 18:25:31.807130+0100",
+      "created": "2024-12-26 15:08:08.834759+0100",
+      "access": "2025-02-03 18:43:48.760468+0100"
+    },
+    "__tree.txt": {
+      "md5": "04d47c4e5324b2663ba46fb7de2125ee",
+      "path": "",
+      "name": "__tree.txt",
+      "size": 393,
+      "attr": "A",
+      "modified": "2025-01-30 11:36:19.322695+0100",
+      "created": "2025-01-30 11:36:19.321631+0100",
+      "access": "2025-02-03 18:43:48.760468+0100"
+    },
+    "___cheatsheet.txt": {
+      "md5": "832b236d0c98252bc8cb1c7fa0719214",
+      "path": "",
+      "name": "___cheatsheet.txt",
+      "size": 6321,
+      "attr": "A",
+      "modified": "2025-02-02 14:16:36.278416+0100",
+      "created": "2025-01-30 11:36:19.310108+0100",
+      "access": "2025-02-03 18:43:48.778414+0100"
+    },
+    "___start.txt": {
+      "md5": "8f409417d13d2bd45f33f35aa5823f62",
+      "path": "",
+      "name": "___start.txt",
+      "size": 340,
+      "attr": "A",
+      "modified": "2025-01-16 18:24:03.418063+0100",
+      "created": "2024-12-20 21:12:24.536691+0100",
+      "access": "2025-02-03 18:43:48.778414+0100"
+    }
+  }
+}
