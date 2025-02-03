@@ -1,21 +1,24 @@
 Python:   3.13.1 (main, Dec  6 2024, 18:07:41) [MSC v.1942 64 bit (AMD64)]
 Platform: Windows-11-10.0.22631-SP0
-Date:     03.02.2025 21:42:05
+Date:     03.02.2025 23:37:50
 Path:     G:\Python\Youtube-download-helper
 
 MyPy 1.14.1 settings:
- --sqlite-cache
- --explicit-package-bases
  --namespace-packages
+ --explicit-package-bases
  --disallow-untyped-calls
  --disallow-untyped-defs
- --disallow-untyped-decorators
  --disallow-incomplete-defs
+ --disallow-untyped-decorators
  --warn-redundant-casts
+ --warn-no-return
+ --warn-return-any
  --warn-unreachable
- --force-uppercase-builtins
- --strict-equality
  --allow-redefinition
+ --extra-checks
+ --force-uppercase-builtins
+ --sqlite-cache
+ --strict-equality
 
 Source files:
  - src/__init__.py

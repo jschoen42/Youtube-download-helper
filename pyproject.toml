@@ -22,4 +22,3 @@ dev = [
 
 [tool.mypy]
 python_version = "3.13"
-mypy_path = "src"
