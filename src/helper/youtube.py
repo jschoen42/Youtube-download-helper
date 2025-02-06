@@ -7,7 +7,7 @@ import yt_dlp                          # type: ignore # mypy
 from yt_dlp.utils import DownloadError # type: ignore # mypy
 
 from utils.trace import Trace, Color
-from utils.util  import export_json
+from utils.file  import export_json
 
 from helper.analyse import analyse_data
 
@@ -41,11 +41,11 @@ def download_video(video_id: str, path: Path | str, only_audio: bool, debug: boo
             if info is None:
                 return False
 
-            title = str(info["title"])
-            channel = info["channel"]
-            timestamp = info["timestamp"]
+            title     = valid_filename(str(info["title"]))
+            channel   = valid_filename(str(info["channel"]))
+            timestamp = float(str(info["timestamp"]))
 
-        export_json( path / valid_filename(channel), valid_filename(title) + ".json", ydl.sanitize_info(info), timestamp = timestamp ) # type: ignore
+        export_json( path / channel, title + ".json", ydl.sanitize_info(info), timestamp = timestamp ) # type: ignore[reportArgumentType] -> ydl.sanitize_info(info)
 
         available_tracks = analyse_data( info, title )
         if only_audio:

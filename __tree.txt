@@ -3,8 +3,13 @@ youtube-download-helper v0.1.0
 │   ├── python-dateutil v2.9.0.post0
 │   │   └── six v1.17.0
 │   └── types-python-dateutil v2.9.0.20241206
-├── yt-dlp v2025.1.26
-├── mypy v1.14.1 (group: dev)
-│   ├── mypy-extensions v1.0.0
-│   └── typing-extensions v4.12.2
-└── types-python-dateutil v2.9.0.20241206 (group: dev)
+├── opustools v1.7.1
+│   └── ruamel-yaml v0.18.10
+├── youtube-transcript-api v0.6.3
+│   ├── defusedxml v0.7.1
+│   └── requests v2.32.3
+│       ├── certifi v2025.1.31
+│       ├── charset-normalizer v3.4.1
+│       ├── idna v3.10
+│       └── urllib3 v2.3.0
+└── yt-dlp v2025.1.26

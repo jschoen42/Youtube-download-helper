@@ -1,9 +1,10 @@
 Python:   3.13.1 (main, Dec  6 2024, 18:07:41) [MSC v.1942 64 bit (AMD64)]
 Platform: Windows-11-10.0.22631-SP0
-Date:     03.02.2025 23:38:30
+Date:     05.02.2025 12:16:08
 Path:     G:\Python\Youtube-download-helper
 
 PyRight 1.1.393 settings:
+ - pythonVersion: 3.13
  - typeCheckingMode: strict
  - reportUnknownArgumentType: False
  - reportUnknownMemberType: False
