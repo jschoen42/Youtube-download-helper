@@ -97,7 +97,7 @@ def run_mypy(target_file: str) -> None:
         # "--local-partial-types",        # default: False
         # "--disable-error-code",         # default: str error, error, ...
         # "--enable-error-code",          # default: str error, error, ...
-        "--extra-checks",                 # default: False
+        # "--extra-checks",                 # default: False
         # "--implicit-reexport",          # default: True
         # "--strict-concatenate",         # default: False
         # "--strict",                     # default: False

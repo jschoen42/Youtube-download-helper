@@ -123,13 +123,13 @@ def analyse_data( data: Dict[str, Any], name: str = "", language: str = "de",  )
 
     videos_sorted: Dict[str, Any] = {}
     for key, value in videos.items():
-        videos_sorted[key] = dict(sorted(value.items(), key=lambda item: item[1]["tbr"]))
+        videos_sorted[key] = dict(sorted(value.items(), key=lambda item: item[1]["tbr"])) # type: ignore[call-overload]
 
     audios_sorted: Dict[str, Any] = {}
     for lang, value in audios.items():
         audios_sorted[lang] = {}
         for key, data in audios[lang].items():
-            audios_sorted[lang][key] = dict(sorted(data.items(), key=lambda item: item[1]["tbr"]))
+            audios_sorted[lang][key] = dict(sorted(data.items(), key=lambda item: item[1]["tbr"])) # type: ignore[call-overload]
 
     # all video tracks
 

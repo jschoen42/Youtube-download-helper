@@ -10,7 +10,7 @@ def parse_arguments() -> Dict[str, Any]:
 
     parser.add_argument("youtube_id", help="Youtube ID - 12 charcters", type=str)
     parser.add_argument("-a", "--only_audio",  action="store_true", help="no video track")
-    parser.add_argument("-d", "--debug",  action="store_true", help="debug printtraffic")
+    parser.add_argument("-d", "--debug",  action="store_true", help="debug: print traffic")
 
     args: Namespace = parser.parse_args()
 
