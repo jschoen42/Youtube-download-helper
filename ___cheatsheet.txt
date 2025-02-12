@@ -158,6 +158,14 @@ py -3.13
 
 %APPDATA%\Code\User\settings.json
 
+#################### packages #####################
+
+python setup.py sdist
+python setup.py bdist_wheel
+python setup.py bdist_wheel sdist
+
+pip install .
+
 ###################### git ########################
 
 git init

@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 29.01.2025
+    © Jürgen Schoenemeyer, 05.02.2025
 
     src/utils/file.py
 

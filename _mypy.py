@@ -45,6 +45,8 @@ def run_mypy(target_file: str) -> None:
 
     settings: List[str] = [
 
+        "--sqlite-cache",                 # default: False
+
         ### Import discovery
         "--namespace-packages",           # default: True
         "--explicit-package-bases",       # default: False
@@ -97,7 +99,7 @@ def run_mypy(target_file: str) -> None:
         # "--local-partial-types",        # default: False
         # "--disable-error-code",         # default: str error, error, ...
         # "--enable-error-code",          # default: str error, error, ...
-        # "--extra-checks",                 # default: False
+        "--extra-checks",                 # default: False
         # "--implicit-reexport",          # default: True
         # "--strict-concatenate",         # default: False
         # "--strict",                     # default: False
@@ -113,14 +115,6 @@ def run_mypy(target_file: str) -> None:
         # "--show-absolute-path",         # default: False
         "--force-uppercase-builtins",     # default: False
         # "--force-union-syntax",         # default: False
-
-        ### Incremental mode
-        # "--incremental",                # default: True
-        # "--cache-dir",                  # default: str
-        "--sqlite-cache",                 # default: False
-        # "--cache-fine-grained",         # default: False
-        # "--skip-version-check",         # default: False
-        # "--skip-cache-mtime-checks",    # default: False
 
         ### Advanced options
         # "--plugins",                    # default: [str] plugin, plugin, ...
@@ -262,4 +256,12 @@ def run_mypy(target_file: str) -> None:
     sys.exit(result.returncode)
 
 if __name__ == "__main__":
-    run_mypy(sys.argv[1])
+    if len(sys.argv) != 2:
+        print("Usage: _mypy.py <dir_or_file>")
+        sys.exit(1)
+
+    try:
+        run_mypy(sys.argv[1])
+    except KeyboardInterrupt:
+        print(" --> KeyboardInterrupt")
+        sys.exit(1)

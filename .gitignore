@@ -1,27 +1,33 @@
-data/*
-!data/.gitkeep
-
 result/*
 !result/.gitkeep
 
-result/audio/*
-result/video/*
-!result/audio/.gitkeep
-!result/video/.gitkeep
+data/*
+!data/.gitkeep
 
-_old
-_json/*
-!_json/.gitkeep
+wav/*
+!wav/.gitkeep
 
-*.7z
 __history.txt
-.mypy_cache
+_trace*/*
+_old/*
+
+.mypy_cache/*
+
+### General
+.env
+*.7z
+*.zip
+*.rar
+*.tar.gz
 
 ### Python
 
-__pycache__/
-.venv*/
-.mypy_cache
+.venv*/*
+*.pyc
+__pycache__/*
+*.pkl
+dist/*
+build/*
 
 ### Windows
 

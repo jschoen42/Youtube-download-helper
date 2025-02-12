@@ -1,6 +1,6 @@
 Python:   3.13.2 (main, Feb  5 2025, 19:16:35) [MSC v.1942 64 bit (AMD64)]
 Platform: Windows-11-10.0.22631-SP0
-Date:     07.02.2025 19:06:07
+Date:     07.02.2025 19:22:44
 Path:     G:\Python\Youtube-download-helper
 
 MyPy 1.15.0 settings:

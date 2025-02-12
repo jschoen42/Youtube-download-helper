@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List # , cast
 from pathlib import Path
 
 from utils.trace import Trace
@@ -67,7 +67,7 @@ def analyse_data( data: Dict[str, Any], name: str = "", language: str = "de",  )
 
         elif acodec != "none":
             type = acodec.split(".")[0]
-            if language in format:
+            if "language" in format:
                 lang = format["language"].split("-")[0]
             else:
                 lang = "unkwown"
@@ -102,12 +102,11 @@ def analyse_data( data: Dict[str, Any], name: str = "", language: str = "de",  )
 
             videos[type][id] = {
                 "codec":    vcodec,
-                # "ext":      format.get("video_ext", ""),
                 "tbr":      round(format["tbr"]),
                 "quality":  round(format["quality"]),
                 "width":    format["width"],
                 "height":   format["height"],
-                "fps":      format["fps"],
+                "fps":      round(format["fps"]),
                 "filesize": format.get("filesize"),
             }
 
@@ -121,15 +120,64 @@ def analyse_data( data: Dict[str, Any], name: str = "", language: str = "de",  )
 
     # sorted by "tbr" (total bitrate)
 
+    """
+    videos: {
+        'vp09': {
+            '602': {'codec': 'vp09.00.10.08', 'tbr':    93, 'quality':  0, 'width':  256, 'height':  144, 'fps': 15, 'filesize': None},
+            '603': {'codec': 'vp09.00.11.08', 'tbr':   169, 'quality':  0, 'width':  256, 'height':  144, 'fps': 30, 'filesize': None},
+            '278': {'codec': 'vp9',           'tbr':    71, 'quality':  0, 'width':  256, 'height':  144, 'fps': 30, 'filesize': 10016992},
+            '604': {'codec': 'vp09.00.20.08', 'tbr':   302, 'quality':  5, 'width':  426, 'height':  240, 'fps': 30, 'filesize': None},
+            '242': {'codec': 'vp9',           'tbr':   145, 'quality':  5, 'width':  426, 'height':  240, 'fps': 30, 'filesize': 20533477},
+            '605': {'codec': 'vp09.00.21.08', 'tbr':   765, 'quality':  6, 'width':  640, 'height':  360, 'fps': 30, 'filesize': None},
+            '243': {'codec': 'vp9',           'tbr':   345, 'quality':  6, 'width':  640, 'height':  360, 'fps': 30, 'filesize': 48873387},
+            '606': {'codec': 'vp09.00.30.08', 'tbr':  1177, 'quality':  7, 'width':  854, 'height':  480, 'fps': 30, 'filesize': None},
+            '244': {'codec': 'vp9',           'tbr':   503, 'quality':  7, 'width':  854, 'height':  480, 'fps': 30, 'filesize': 71316031},
+            '609': {'codec': 'vp09.00.31.08', 'tbr':  2171, 'quality':  8, 'width': 1280, 'height':  720, 'fps': 30, 'filesize': None},
+            '247': {'codec': 'vp9',           'tbr':  1053, 'quality':  8, 'width': 1280, 'height':  720, 'fps': 30, 'filesize': 149326182},
+            '614': {'codec': 'vp09.00.40.08', 'tbr':  3566, 'quality':  9, 'width': 1920, 'height': 1080, 'fps': 30, 'filesize': None},
+            '248': {'codec': 'vp9',           'tbr':  1656, 'quality':  9, 'width': 1920, 'height': 1080, 'fps': 30, 'filesize': 234733705},
+            '620': {'codec': 'vp09.00.50.08', 'tbr':  9511, 'quality': 10, 'width': 2560, 'height': 1440, 'fps': 30, 'filesize': None},
+            '271': {'codec': 'vp9',           'tbr':  7508, 'quality': 10, 'width': 2560, 'height': 1440, 'fps': 30, 'filesize': 1064199484},
+            '625': {'codec': 'vp09.00.50.08', 'tbr': 18853, 'quality': 11, 'width': 3840, 'height': 2160, 'fps': 30, 'filesize': None},
+            '313': {'codec': 'vp9',            tbr': 16995, 'quality': 11, 'width': 3840, 'height': 2160, 'fps': 30, 'filesize': 2409020956}
+        },
+
+           =>
+
+        'vp09': {
+            '278': {'codec': 'vp9',           'tbr':    71, 'quality':  0, 'width':  256, 'height':  144, 'fps': 30, 'filesize': 10016992},
+            '602': {'codec': 'vp09.00.10.08', 'tbr':    93, 'quality':  0, 'width':  256, 'height':  144, 'fps': 15, 'filesize': None},
+            '242': {'codec': 'vp9',           'tbr':   145, 'quality':  5, 'width':  426, 'height':  240, 'fps': 30, 'filesize': 20533477},
+            '603': {'codec': 'vp09.00.11.08', 'tbr':   169, 'quality':  0, 'width':  256, 'height':  144, 'fps': 30, 'filesize': None},
+            '604': {'codec': 'vp09.00.20.08', 'tbr':   302, 'quality':  5, 'width':  426, 'height':  240, 'fps': 30, 'filesize': None},
+            '243': {'codec': 'vp9',           'tbr':   345, 'quality':  6, 'width':  640, 'height':  360, 'fps': 30, 'filesize': 48873387},
+            '244': {'codec': 'vp9',           'tbr':   503, 'quality':  7, 'width':  854, 'height':  480, 'fps': 30, 'filesize': 71316031},
+            '605': {'codec': 'vp09.00.21.08', 'tbr':   765, 'quality':  6, 'width':  640, 'height':  360, 'fps': 30, 'filesize': None},
+            '247': {'codec': 'vp9',           'tbr':  1053, 'quality':  8, 'width': 1280, 'height':  720, 'fps': 30, 'filesize': 149326182},
+            '606': {'codec': 'vp09.00.30.08', 'tbr':  1177, 'quality':  7, 'width':  854, 'height':  480, 'fps': 30, 'filesize': None},
+            '248': {'codec': 'vp9',           'tbr':  1656, 'quality':  9, 'width': 1920, 'height': 1080, 'fps': 30, 'filesize': 234733705},
+            '609': {'codec': 'vp09.00.31.08', 'tbr':  2171, 'quality':  8, 'width': 1280, 'height':  720, 'fps': 30, 'filesize': None},
+            '614': {'codec': 'vp09.00.40.08', 'tbr':  3566, 'quality':  9, 'width': 1920, 'height': 1080, 'fps': 30, 'filesize': None},
+            '271': {'codec': 'vp9',           'tbr':  7508, 'quality': 10, 'width': 2560, 'height': 1440, 'fps': 30, 'filesize': 1064199484},
+            '620': {'codec': 'vp09.00.50.08', 'tbr':  9511, 'quality': 10, 'width': 2560, 'height': 1440, 'fps': 30, 'filesize': None},
+            '313': {'codec': 'vp9',           'tbr': 16995, 'quality': 11, 'width': 3840, 'height': 2160, 'fps': 30, 'filesize': 2409020956},
+            '625': {'codec': 'vp09.00.50.08', 'tbr': 18853, 'quality': 11, 'width': 3840, 'height': 2160, 'fps': 30, 'filesize': None}
+        },
+        ...
+    }
+    """
+
     videos_sorted: Dict[str, Any] = {}
     for key, value in videos.items():
         videos_sorted[key] = dict(sorted(value.items(), key=lambda item: item[1]["tbr"])) # type: ignore[call-overload]
+        # videos_sorted[key] = dict(sorted(value.items(), key=lambda item: cast(Dict[str, Any], item[1])["tbr"]))
 
     audios_sorted: Dict[str, Any] = {}
     for lang, value in audios.items():
         audios_sorted[lang] = {}
         for key, data in audios[lang].items():
             audios_sorted[lang][key] = dict(sorted(data.items(), key=lambda item: item[1]["tbr"])) # type: ignore[call-overload]
+            # audios_sorted[lang][key] = dict(sorted(data.items(), key=lambda item: cast(Dict[str, Any], item[1])["tbr"]))
 
     # all video tracks
 
@@ -169,5 +217,4 @@ def analyse_data( data: Dict[str, Any], name: str = "", language: str = "de",  )
         "audio": audio_best,
     }
     Trace.result(f"{result}")
-
     return result
