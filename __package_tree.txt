@@ -1,4 +1,4 @@
-youtube-download-helper v0.1.0
+youtube-download-helper v0.1.1
 ├── arrow v1.3.0
 │   ├── python-dateutil v2.9.0.post0
 │   │   └── six v1.17.0

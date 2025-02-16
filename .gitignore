@@ -12,6 +12,10 @@ _trace*/*
 _old/*
 
 .mypy_cache/*
+.type-check-result/*
+
+.timestamps.json
+.Python31?-*
 
 ### General
 .env
@@ -28,6 +32,7 @@ __pycache__/*
 *.pkl
 dist/*
 build/*
+*/zz_utils.egg-info/*
 
 ### Windows
 

@@ -6,6 +6,7 @@ import sys
 import subprocess
 import platform
 import time
+import argparse
 
 from typing import List
 from pathlib import Path
@@ -13,6 +14,8 @@ from datetime import datetime
 
 BASE_PATH = Path(sys.argv[0]).parent.parent.resolve()
 RESULT_FOLDER = ".type-check-result"
+
+LINEFEET = "\n"
 
 # temp.toml
 
@@ -22,23 +25,28 @@ CONFIG: str = \
 mypy_path = "src"
 python_version = "[version]"
 exclude = [
-    "/extras/*"
+    "/extras/*",
 ]
+
+[[tool.mypy.overrides]]
+module = "*.models"
+ignore_errors = true
 
 [[tool.mypy.overrides]]
 module = "faster_whisper.*"
 ignore_errors = true
 """
 
-def run_mypy(target_file: str) -> None:
+def run_mypy(src_path: Path, python_version: str) -> None:
 
-    try:
-        with open(".python-version", "r") as f:
-            version = f.read().strip()
-    except OSError:
-        version = f"{sys.version_info.major}.{sys.version_info.minor}"
+    if python_version == "":
+        try:
+            with open(".python-version", "r") as f:
+                python_version = f.read().strip()
+        except OSError:
+            python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
 
-    configuration = CONFIG.replace("[version]", version )
+    configuration = CONFIG.replace("[version]", python_version )
 
     # https://mypy.readthedocs.io/en/stable/command_line.html
     # https://gist.github.com/Michael0x2a/36c5948a7ea571b722686226639b0859
@@ -170,25 +178,26 @@ def run_mypy(target_file: str) -> None:
 
     start = time.time()
 
-    filepath = Path(sys.argv[1])
-    if not filepath.exists():
-        print(f"Error: '{filepath}' not found ")
+    if not src_path.exists():
+        print(f"Error: path '{src_path}' not found ")
         return
 
-    name = filepath.stem
+    name = src_path.stem
+    if name == "":
+        name = "."
 
     folder_path = BASE_PATH / RESULT_FOLDER
     if not folder_path.exists():
         folder_path.mkdir(parents=True, exist_ok=True)
 
-    text =  f"Python:   {sys.version}\n"
+    text =  f"Python:   {sys.version.replace(LINEFEET, ' ')}\n"
     text += f"Platform: {platform.platform()}\n"
-    text += f"Date:     {datetime.now().strftime("%d.%m.%Y %H:%M:%S")}\n"
+    text += f"Date:     {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}\n"
     text += f"Path:     {BASE_PATH}\n"
     text += "\n"
 
     text += "MyPy [version] settings:\n"
-    text += f" - Python version {version}\n"
+    text += f" » Python version {python_version}\n"
     for setting in settings:
         text += f" {setting}\n"
     text += "\n"
@@ -197,11 +206,7 @@ def run_mypy(target_file: str) -> None:
     with open(config, "w") as config_file:
         config_file.write(configuration)
 
-    result = subprocess.run(["mypy", target_file, "--config-file", "tmp.toml", "--verbose"] + settings, capture_output=True, text=True)
-    # if result.returncode == 2:
-    #     print("error: ", result.stderr)
-    #     sys.exit(2)
-    # "--verbose" -> stderr
+    result = subprocess.run(["mypy", str(src_path), "--config-file", "tmp.toml", "--verbose"] + settings, capture_output=True, text=True)
 
     os.remove(config)
 
@@ -220,13 +225,6 @@ def run_mypy(target_file: str) -> None:
                 # if not path.endswith("__init__.py"):
                 sources.append(path)
             continue
-
-        # if "Build finished" in line:
-        #     pattern = r"finished in ([\d\.]+) seconds.*with (\d+) modules"
-        #     matches = re.search(pattern, line)
-        #     if matches:
-        #         seconds = matches.group(1)
-        #         modules = matches.group(2)
 
     text += "Source files:\n"
     for source in sources:
@@ -248,20 +246,23 @@ def run_mypy(target_file: str) -> None:
 
         text += f"{line}\n"
 
-    with open(folder_path / f"mypy-{name}.txt", "w") as file:
+    result_filename = f"mypy-{python_version}-'{name}'.txt"
+    with open(folder_path / result_filename, "w", newline="\n") as file:
         file.write(text)
 
     duration = time.time() - start
-    print(f"[MyPy {version} ({duration:.2f} sec)] {sys.argv[1:][0]}: {summary} -> {RESULT_FOLDER}/mypy-{name}.txt")
+    print(f"[MyPy {version} ({duration:.2f} sec)] '{name}': {summary} -> {RESULT_FOLDER}/{result_filename}")
     sys.exit(result.returncode)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: _mypy.py <dir_or_file>")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="static type check with mypy")
+    parser.add_argument("path", nargs="?", type=str, default=".", help="relative path to a file or folder")
+    parser.add_argument("-v", "--version", type=str, default="", help="Python version 3.10/3.11/...")
+
+    args = parser.parse_args()
 
     try:
-        run_mypy(sys.argv[1])
+        run_mypy(Path(args.path), args.version)
     except KeyboardInterrupt:
         print(" --> KeyboardInterrupt")
         sys.exit(1)

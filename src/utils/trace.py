@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 02.02.2025
+    © Jürgen Schoenemeyer, 18.02.2025
 
     src/utils/trace.py
 
@@ -42,7 +42,7 @@ import inspect
 import importlib.util
 
 from typing import Any, Callable, Dict, List
-from enum import StrEnum
+from enum import Enum
 from pathlib import Path
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -52,6 +52,10 @@ from zoneinfo import ZoneInfoNotFoundError
 
 def ansi_code(code: int) -> str:
     return f"\033[{code}m"
+
+class StrEnum(Enum):
+    def __str__(self) -> str: # type: ignore[reportImplicitOverride]
+        return self.value
 
 class Color(StrEnum):
     RESET            = ansi_code(0)
@@ -105,7 +109,6 @@ class Color(StrEnum):
     def clear(text: str) -> str:
         return re.sub(r"\033\[[0-9;]*m", "", text)
 
-
 pattern = {
     "time":      " --> ",
     "action":    " >>> ",
@@ -124,7 +127,7 @@ pattern = {
     "debug":     "DEBUG", # only in debug mode
     "wait":      "WAIT ", # only in debug mode
 
-    "clear":     " ••• ", # only internal (for decorator, ...)
+    "clear":     " $$$ ", # only internal (for decorator, ...) - •••
 }
 
 class Trace:
@@ -162,7 +165,7 @@ class Trace:
                     # tzdata installed ?
 
                     if importlib.util.find_spec("tzdata") is None:
-                        print( f"{pattern["warning"]} install 'tzdata' for named timezones")
+                        print( f"{pattern['warning']} install 'tzdata' for named timezones")
                         cls.settings[key] = True
                     else:
 
@@ -301,7 +304,7 @@ class Trace:
                 if platform.system() == "Windows":
                     import msvcrt
 
-                    key = msvcrt.getch()
+                    key = msvcrt.getch()                      # type: ignore[attr-defined] # -> Linux
                     print()
 
                 else: # unix terminal
@@ -310,14 +313,14 @@ class Trace:
                     import termios
 
                     fd: int = sys.stdin.fileno()
-                    old_settings: Any = termios.tcgetattr(fd)  # type: ignore[attr-defined]
+                    old_settings: Any = termios.tcgetattr(fd)  # type: ignore[attr-defined] # -> Windows
                     try:
-                        tty.setraw(sys.stdin.fileno())         # type: ignore[attr-defined]
+                        tty.setraw(sys.stdin.fileno())         # type: ignore[attr-defined] # -> Windows
                         key = sys.stdin.buffer.read(1)
                     finally:
-                        termios.tcsetattr(                     # type: ignore[attr-defined]
+                        termios.tcsetattr(                     # type: ignore[attr-defined] # -> Windows
                             fd,
-                            termios.TCSADRAIN,                 # type: ignore[attr-defined]
+                            termios.TCSADRAIN,                 # type: ignore[attr-defined] # -> Windows
                             old_settings
                         )
                         print()
@@ -409,10 +412,7 @@ class Trace:
 
         line_no = str(trace_frame.f_lineno).zfill(3)
 
-        # line_no = str(inspect.currentframe().f_back.f_back.f_lineno).zfill(3)
-        # caller = inspect.currentframe().f_back.f_back.f_code.co_qualname
-
-        caller = trace_frame.f_code.co_qualname # .co_qualname (3.11 or newer)
+        caller = trace_frame.f_code.co_name
         caller = caller.replace(".<locals>.", " → ")
 
         if caller == "<module>":
