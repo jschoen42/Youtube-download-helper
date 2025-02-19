@@ -1,7 +1,4 @@
-# uv run _pyright.py src
-
-# install: npm install --global pyright
-# update:  npm update --global pyright
+# uv run _basedpyright.py src
 
 import json
 import os
@@ -23,7 +20,7 @@ RESULT_FOLDER = ".type-check-result"
 
 LINEFEET = "\n"
 
-def run_pyright(src_path: Path, python_version: str) -> None:
+def run_basedpyright(src_path: Path, python_version: str) -> None:
 
     if python_version == "":
         try:
@@ -99,7 +96,7 @@ def run_pyright(src_path: Path, python_version: str) -> None:
     text += f"Path:     {BASE_PATH}\n"
     text += "\n"
 
-    text += "PyRight [version] settings:\n"
+    text += "BasedPyRight [version] settings:\n"
     for key, value in settings.items():
         text += f" - {key}: {value}\n"
 
@@ -108,9 +105,9 @@ def run_pyright(src_path: Path, python_version: str) -> None:
         json.dump(settings, config_file, indent=2)
 
     try:
-        result: CompletedProcess[str] = subprocess.run([npx_path, "pyright", src_path, "--project", config, "--outputjson"], capture_output=True, text=True)
+        result: CompletedProcess[str] = subprocess.run(["basedpyright", src_path, "--project", config, "--outputjson"], capture_output=True, text=True)
     except Exception as err:
-        print(f"error: {err} - pyright")
+        print(f"error: {err} - basedpyright")
         sys.exit(1)
     finally:
         os.remove(config)
@@ -120,7 +117,7 @@ def run_pyright(src_path: Path, python_version: str) -> None:
         print(result.stderr)
         sys.exit(result.returncode)
 
-    stdout = result.stdout.encode(encoding="cp1252").decode(encoding="utf-8").replace("\xa0", " ")
+    stdout = result.stdout.encode("cp1252").decode("utf-8").replace("\xa0", " ")
     data = json.loads(stdout)
 
     # {
@@ -200,23 +197,23 @@ def run_pyright(src_path: Path, python_version: str) -> None:
 
     text += footer + "\n"
 
-    result_filename = f"PyRight-{python_version}-'{name}'.txt"
+    result_filename = f"BasedPyRight-{python_version}-'{name}'.txt"
     with open(folder_path / result_filename, mode="w", newline="\n") as f:
         f.write(text)
 
     duration = time.time() - start
-    print(f"[PyRight {version} ({duration:.2f} sec)] {footer} -> {RESULT_FOLDER}/{result_filename}")
+    print(f"[BasedPyRight {version} ({duration:.2f} sec)] {footer} -> {RESULT_FOLDER}/{result_filename}")
     sys.exit(result.returncode)
 
 if __name__ == "__main__":
-    parser = ArgumentParser(description="static type check with PyRight")
+    parser = ArgumentParser(description="static type check with BasedPyRight")
     parser.add_argument("path", nargs="?", type=str, default=".", help="relative path to a file or folder")
     parser.add_argument("-v", "--version", type=str, default="",  help="Python version 3.10/3.11/...")
 
     args = parser.parse_args()
 
     try:
-        run_pyright(Path(args.path), args.version)
+        run_basedpyright(Path(args.path), args.version)
     except KeyboardInterrupt:
         print(" --> KeyboardInterrupt")
         sys.exit(1)

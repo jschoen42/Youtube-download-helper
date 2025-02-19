@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 18.02.2025
+    © Jürgen Schoenemeyer, 20.02.2025
 
     src/utils/trace.py
 
@@ -42,6 +42,8 @@ import inspect
 import importlib.util
 
 from typing import Any, Callable, Dict, List
+from typing_extensions import override
+from types import FrameType
 from enum import Enum
 from pathlib import Path
 from datetime import datetime
@@ -54,6 +56,7 @@ def ansi_code(code: int) -> str:
     return f"\033[{code}m"
 
 class StrEnum(Enum):
+    @override
     def __str__(self) -> str: # type: ignore[reportImplicitOverride]
         return self.value
 
@@ -109,7 +112,7 @@ class Color(StrEnum):
     def clear(text: str) -> str:
         return re.sub(r"\033\[[0-9;]*m", "", text)
 
-pattern = {
+pattern: Dict[str, str] = {
     "time":      " --> ",
     "action":    " >>> ",
     "result":    " ==> ",
@@ -131,10 +134,10 @@ pattern = {
 }
 
 class Trace:
-    BASE_PATH = Path(sys.argv[0]).parent
+    BASE_PATH: Path = Path(sys.argv[0]).parent
 
-    default_base = BASE_PATH.resolve()
-    default_base_folder = str(default_base).replace("\\", "/")
+    default_base: Path = BASE_PATH.resolve()
+    default_base_folder: str = str(default_base).replace("\\", "/")
 
     settings: Dict[str, Any] = {
         "appl_folder":    default_base_folder + "/",
@@ -149,9 +152,9 @@ class Trace:
         "show_caller":    True,
     }
 
-    pattern: List[str] = []
+    pattern:  List[str] = []
     messages: List[str] = []
-    csv: bool     = False
+    csv: bool = False
     output: Callable[..., None] | None = None
 
     @classmethod
@@ -334,11 +337,11 @@ class Trace:
 
     @classmethod
     def __check_file_output(cls) -> bool:
-        current_frame = inspect.currentframe()
+        current_frame: FrameType | None = inspect.currentframe()
         if current_frame is None:
             return False
 
-        caller_frame = current_frame.f_back
+        caller_frame: FrameType | None = current_frame.f_back
         if caller_frame is None:
             return False
 
@@ -376,11 +379,11 @@ class Trace:
 
     @staticmethod
     def __get_pattern() -> str:
-        current_frame = inspect.currentframe()
+        current_frame: FrameType | None = inspect.currentframe()
         if current_frame is None:
             return pattern["clear"]
 
-        caller_frame = current_frame.f_back
+        caller_frame: FrameType | None = current_frame.f_back
         if caller_frame is None:
             return pattern["clear"]
 
@@ -398,15 +401,15 @@ class Trace:
         path = inspect.stack()[2][1].replace("\\", "/")
         path = path.split(cls.settings["appl_folder"])[-1]
 
-        current_frame = inspect.currentframe()
+        current_frame: FrameType | None = inspect.currentframe()
         if current_frame is None:
             return ""
 
-        caller_frame = current_frame.f_back
+        caller_frame: FrameType | None = current_frame.f_back
         if caller_frame is None:
             return ""
 
-        trace_frame = caller_frame.f_back
+        trace_frame: FrameType | None = caller_frame.f_back
         if trace_frame is None:
             return ""
 
@@ -451,7 +454,7 @@ class Trace:
         def is_redirected(stream: Any) -> bool:
             return not hasattr(stream, "isatty") or not stream.isatty()
 
-        if not cls.settings["color"] or is_redirected(sys.stdout):
+        if not cls.settings["color"] or is_redirected(stream=sys.stdout):
             text_no_tabs = Color.clear(text_no_tabs)
 
         # https://docs.python.org/3/library/sys.html#sys.displayhook

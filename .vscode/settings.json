@@ -10,6 +10,7 @@
   "editor.formatOnSave": false,
   "editor.autoClosingQuotes": "never",
   "editor.autoSurround": "never",
+  "editor.inlineSuggest.enabled": true,
 
   "files.eol": "\n",
   "files.trimTrailingWhitespace": true,
@@ -71,7 +72,7 @@
   "python.analysis.diagnosticSeverityOverrides": {
     "reportUnnecessaryTypeIgnoreComment": "none"
   },
-  "python.analysis.typeCheckingMode": "off",
+  "python.analysis.typeCheckingMode": "basic",
   "_errorLens.codeLensEnabled": true,
   "errorLens.delay": 2000,
   "errorLens.followCursor": "activeLine",

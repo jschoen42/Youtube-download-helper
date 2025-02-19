@@ -342,13 +342,6 @@ python _mypy.py src/main.py
 npm install --global pyright
 npm update --global pyright
 
-[tool.pyright]
-include = ["src"]
-exclude = ["**/node_modules",
-    "**/__pycache__",
-]
-pythonVersion = "3.13"
-
 python _pyright.py src/main.py
  -> only main.py will be checked
 
@@ -358,3 +351,22 @@ python _pyright.py src
 python _pyright.py src/main
 python _pyright.py src/helper
 python _pyright.py src/utils
+
+################## basedpyright ###################
+
+uv add basedpyright --dev
+
+pyproject.toml:
+---------------
+[tool.basedpyright]
+deprecateTypingAliases = false
+reportAny = false
+reportExplicitAny = false
+reportImplicitRelativeImport = false
+reportUnusedCallResult = false
+reportUnknownArgumentType = false
+reportUnknownVariableType = false
+reportUnknownMemberType = false
+
+python _basedpyright.py src
+uv run _basedpyright.py src

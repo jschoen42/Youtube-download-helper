@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 16.02.2025
+    © Jürgen Schoenemeyer, 20.02.2025
 
     src/utils/file.py
 
@@ -64,6 +64,7 @@ import filecmp
 from typing import Any, Dict, List, Tuple
 from os.path import isfile, isdir, join
 from pathlib import Path
+from re import Match
 
 from utils.trace import Trace
 
@@ -108,7 +109,7 @@ def check_file_exists(filepath_start: Path | str, filepath_end: Path | str) -> b
         return False
 
     try:
-        filenames = os.listdir(filepath)
+        filenames: list[str] = os.listdir(filepath)
     except OSError as err:
         Trace.error(f"{err}")
         return False
@@ -263,7 +264,7 @@ def get_folders_in_folder( path: Path ) -> List[str]:
     return [f for f in os.listdir(path) if isdir(join(path, f))]
 
 def get_save_filename( path: Path, stem: str, suffix: str ) -> str:
-    files = get_files_in_folder( path )
+    files: List[str] = get_files_in_folder( path )
 
     name = stem
     while name + suffix in files:
@@ -384,7 +385,7 @@ def export_file(
     if overwrite:
         my_filename = filename
     else:
-        tmp = filename.split(".")
+        tmp: list[str] = filename.split(".")
         ext = tmp.pop()
         dest2 = ".".join(tmp)
         copy = ""
@@ -400,7 +401,7 @@ def export_file(
         my_filename = dest2 + copy + "." + ext
 
     try:
-        with open(Path(filepath, my_filename), "r", encoding=encoding) as file:
+        with open(Path(filepath, my_filename), mode="r", encoding=encoding) as file:
             ref_text = file.read()
     except OSError:
         ref_text = ""
@@ -427,7 +428,7 @@ def export_file(
                     return None
 
         try:
-            with open(Path(filepath, my_filename), "w", encoding=encoding, newline=newline) as file:
+            with open(Path(filepath, my_filename), mode="w", encoding=encoding, newline=newline) as file:
                 file.write(text)
 
             if timestamp != 0:
@@ -461,7 +462,7 @@ def export_file(
 def _increment_filename(filename_stem: str) -> str:
     pattern = r"^(.*?)(?: \((\d+)\))?$"
 
-    match = re.match(pattern, filename_stem)
+    match: Match[str] | None = re.match(pattern, filename_stem)
     if match:
         base_name, number = match.groups()
         number = int(number) + 1 if number else 1
@@ -484,7 +485,7 @@ def get_filename_unique(dirpath: Path, filename: str) -> str:
     return stem + append + suffix
 
 def find_matching_file(path_name: str) -> bool | str:
-    s = glob.glob(path_name)
+    s: list[str] = glob.glob(path_name)
 
     if len(s) == 0:
         Trace.error(f"file not found: {path_name}")
@@ -499,7 +500,7 @@ def find_matching_file(path_name: str) -> bool | str:
 def find_matching_file_path(dirpath: Path, filename: str) -> None | Path:
     filepath = str(dirpath / filename)
 
-    s = glob.glob( filepath )
+    s: list[str] = glob.glob(filepath)
 
     if len(s) == 0:
         Trace.error(f"file not found: {filepath}")
@@ -522,7 +523,7 @@ def get_file_infos(path: Path | str, filename: str, _in_type: str) -> None | Dic
     filepath = Path(path, filename)
 
     if os.path.isfile(filepath):
-        with open(filepath, "rb") as file:
+        with open(filepath, mode="rb") as file:
             md5 = hashlib.md5(file.read()).hexdigest()
 
         size           = os.path.getsize(filepath)
@@ -551,7 +552,7 @@ def copy_my_file(source: str, dest: str, _show_updated: bool) -> bool:
     if not os.path.exists(dest) or not filecmp.cmp(source, dest):
         try:
             shutil.copyfile(source, dest)
-            set_modification_timestamp(dest, new_timestamp)
+            set_modification_timestamp(dest, timestamp=new_timestamp)
             Trace.info( f"copy {dest}" )
 
         except OSError as err:
