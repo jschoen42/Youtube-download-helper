@@ -1,15 +1,15 @@
+from __future__ import annotations
+
 import time
-
-from typing import Any, Dict
 from pathlib import Path
+from typing import Any, Dict
 
-import yt_dlp                          # type: ignore[import-untyped]
-from yt_dlp.utils import DownloadError # type: ignore[import-untyped]
-
-from utils.trace import Trace, Color
-from utils.file  import export_json
+import yt_dlp  # type: ignore[import-untyped]
+from yt_dlp.utils import DownloadError  # type: ignore[import-untyped]
 
 from helper.analyse import analyse_data
+from utils.file import export_json
+from utils.trace import Color, Trace
 
 # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/YoutubeDL.py#L128-L278
 
@@ -45,7 +45,8 @@ def download_video(video_id: str, path: Path | str, only_audio: bool, debug: boo
             channel   = valid_filename(str(info["channel"]))
             timestamp = float(str(info["timestamp"]))
 
-        export_json( path / channel, title + ".json", ydl.sanitize_info(info), timestamp = timestamp ) # type: ignore[reportArgumentType] # -> ydl.sanitize_info(info)
+        data_info = ydl.sanitize_info(info)
+        export_json( path / channel, title + ".json", data_info, timestamp = timestamp ) # type: ignore[reportArgumentType] # -> ydl.sanitize_info(info)
 
         available_tracks = analyse_data( info, title )
         if only_audio:

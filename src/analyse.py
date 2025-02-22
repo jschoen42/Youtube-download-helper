@@ -3,10 +3,9 @@
 
 import sys
 
+from helper.analyse import analyse_json_all  # , analyse_json
 from utils.globals import BASE_PATH
-from utils.trace   import Trace
-
-from helper.analyse import analyse_json_all # , analyse_json
+from utils.trace import Trace
 
 DIR_JSON = BASE_PATH / "_json"
 
@@ -19,6 +18,6 @@ def main() -> None:
     analyse_json_all( DIR_JSON, "de")
 
 if __name__ == "__main__":
-    Trace.set( debug_mode=True, timezone=False )
+    Trace.set(debug_mode=True, timezone=False)
     Trace.action(f"Python version {sys.version}")
     main()

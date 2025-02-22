@@ -1,7 +1,9 @@
 # import sys
 
-from typing import Any, Dict
+from __future__ import annotations
+
 from argparse import ArgumentParser, Namespace
+from typing import Any, Dict
 
 # https://docs.python.org/3.12/howto/argparse.html#argparse-tutorial
 

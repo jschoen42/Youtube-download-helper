@@ -331,8 +331,12 @@ module = "faster_whisper.*"
 ignore_errors = true
 ignore_missing_imports = true
 
-python _mypy.py src/main.py
- -> main.py and all imported (!) files will be checked
+python _mypy.py src
+
+bug:
+ - src/main/
+ - src/main.py
+     -> main.py not analysed
 
 # type: ignore
 # type: ignore[attr-defined]
@@ -359,10 +363,11 @@ uv add basedpyright --dev
 pyproject.toml:
 ---------------
 [tool.basedpyright]
-deprecateTypingAliases = false
+deprecateTypingAliases =  false
 reportAny = false
 reportExplicitAny = false
 reportImplicitRelativeImport = false
+reportMissingTypeStubs = false
 reportUnusedCallResult = false
 reportUnknownArgumentType = false
 reportUnknownVariableType = false

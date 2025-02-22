@@ -19,18 +19,18 @@
 # uv run python src/main.py -a
 
 import sys
-
-from utils.globals import BASE_PATH
-from utils.trace import Trace
+from typing import Any, Dict
 
 from helper.argsparse import parse_arguments
 from helper.youtube import download_video
+from utils.globals import BASE_PATH
+from utils.trace import Trace
 
 DEST_VIDEO = BASE_PATH / "result" / "video"
 DEST_AUDIO = BASE_PATH / "result" / "audio"
 
 def main() -> None:
-    args = parse_arguments()
+    args: Dict[str, Any] = parse_arguments()
     Trace.info(f"Arguments: {args}")
 
     yt_id = ("-" + args["id"])[-11:]
@@ -39,12 +39,12 @@ def main() -> None:
     debug = args["debug"]
 
     if only_audio:
-        _ret = download_video( yt_id, DEST_AUDIO, True, debug )
+        _ret = download_video(yt_id, DEST_AUDIO, True, debug)
     else:
-        _ret = download_video( yt_id, DEST_VIDEO, False, debug )
+        _ret = download_video(yt_id, DEST_VIDEO, False, debug)
 
 if __name__ == "__main__":
-    Trace.set( debug_mode=False, timezone=False )
+    Trace.set(debug_mode=False, timezone=False)
     Trace.action(f"Python version {sys.version}")
     Trace.action(f"BASE_PATH: '{BASE_PATH.resolve()}'")
 

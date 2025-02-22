@@ -1,8 +1,12 @@
-from typing import Any, Dict, List # , cast
-from pathlib import Path
+from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any, Dict, List  # , cast
+
+from utils.file import import_json, listdir_match_extention
 from utils.trace import Trace
-from utils.file  import listdir_match_extention, import_json
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # yt-dlp https://www.youtube.com/watch?v=37SpumiGHgE --list-formats
 
@@ -19,7 +23,7 @@ def analyse_json( path: Path, filename: str, language: str = "de" ) -> None:
     _result = analyse_data( data, filename, language )
     # Trace.result( result )
 
-def analyse_data( data: Dict[str, Any], name: str = "", language: str = "de",  ) -> Dict[str, Any]:
+def analyse_data( data: Dict[str, Any], name: str = "", language: str = "de" ) -> Dict[str, Any]:
 
     # pass 1 - find all I
 
@@ -170,14 +174,12 @@ def analyse_data( data: Dict[str, Any], name: str = "", language: str = "de",  )
     videos_sorted: Dict[str, Any] = {}
     for key, value in videos.items():
         videos_sorted[key] = dict(sorted(value.items(), key=lambda item: item[1]["tbr"])) # type: ignore[call-overload]
-        # videos_sorted[key] = dict(sorted(value.items(), key=lambda item: cast(Dict[str, Any], item[1])["tbr"]))
 
     audios_sorted: Dict[str, Any] = {}
-    for lang, value in audios.items():
+    for lang in audios:
         audios_sorted[lang] = {}
-        for key, data in audios[lang].items():
-            audios_sorted[lang][key] = dict(sorted(data.items(), key=lambda item: item[1]["tbr"])) # type: ignore[call-overload]
-            # audios_sorted[lang][key] = dict(sorted(data.items(), key=lambda item: cast(Dict[str, Any], item[1])["tbr"]))
+        for key, audio_data in audios[lang].items():
+            audios_sorted[lang][key] = dict(sorted(audio_data.items(), key=lambda item: item[1]["tbr"])) # type: ignore[call-overload]
 
     # all video tracks
 
@@ -200,7 +202,7 @@ def analyse_data( data: Dict[str, Any], name: str = "", language: str = "de",  )
                 Trace.debug( f"id: {type:3} - tbr: {types['tbr']:4} - codec: {types['codec']}")
 
     if len( audios_sorted ) == 1:
-        language = list(audios_sorted.keys())[0]
+        language = next(iter(audios_sorted.keys()))
     elif original_language:
         language = original_language
 
