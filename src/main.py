@@ -31,7 +31,7 @@ def validate_id(_ctx: click.Context, _param: click.Parameter, value: str) -> str
     return value
 
 @click.command()
-@click.option("-id", "--youtube_id", callback=validate_id, prompt="Youtube ID (11 char)", help="Youtube ID - 11 charcters")
+@click.option("-id", "--youtube_id", callback=validate_id, prompt="Youtube ID (11 char)", help="Youtube ID - 11 characters")
 @click.option("-l",  "--language", help="audio language", default="de")
 @click.option("-a",  "--audio", is_flag=True, help="only audio track")
 @click.option("-d",  "--debug", is_flag=True, help="debug: show web traffic")

@@ -15,17 +15,17 @@ uv run src/main.py -id <youtube id> -a
 #### parameter
 
 ``` bash
--id, --youtube_id -> Youtube ID (11 charcters)
+-id, --youtube_id -> Youtube ID (11 characters)
 -l, --language    -> audio language (default="de")
 -a, --audio       -> only audio track
 -d, --debug       -> show web traffic
 ```
 
-#### result
+#### download
 
 ``` bash
- -> result/video/<channel>/<title>.webm
- -> result/audio/<channel>/<title>.m4a
+ -> ./result/video/<channel>/<title>.webm
+ -> ./result/audio/<channel>/<title>.m4a
 ```
 
 #### dependencies
