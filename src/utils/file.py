@@ -51,7 +51,6 @@
     PRIVATE:
      - _increment_filename(filename_stem: str) -> str
 """
-
 from __future__ import annotations
 
 import datetime

@@ -65,6 +65,7 @@ ignore = [
     "A001",    # builtin-variable-shadowing
     "A005",    # stdlib-module-shadowing (-> utils.trace)
     "ANN401",  # any-type
+    "ARG001",  # unused-function-argument
     "E501",    # line too long
     "PERF203", # try-except-in-loop
     "PERF401", # manual-list-comprehension
@@ -82,10 +83,14 @@ ignore = [
     "SIM103",  # needless-bool
     "SIM105",  # suppressible-exception
     "SIM108",  # if-else-block-instead-of-if-exp
-
+    "SIM110",  # reimplemented-builtin
     "UP006",   # non-pep585-annotation
     "UP035",   # deprecated-import
     "RUF001",  # ambiguous-unicode-character-string
     "RUF003",  # ambiguous-unicode-character-comment
     "RUF100",  # unused-noqa
+    "TD002",   # missing-todo-author
+    "TD003",   # missing-todo-link
+
+    "FIX002",  # line-contains-todo
 ]

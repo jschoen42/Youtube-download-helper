@@ -1,3 +1,11 @@
+"""
+    © Jürgen Schoenemeyer, 24.02.2025
+
+    src/helper/youtube.py
+
+    PUBLIC:
+     - download_video(video_id: str, path: Path | str, language: str, only_audio: bool, debug: bool = False) -> bool
+"""
 from __future__ import annotations
 
 import time
@@ -13,7 +21,7 @@ from utils.trace import Color, Trace
 
 # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/YoutubeDL.py#L128-L278
 
-def download_video(video_id: str, path: Path | str, only_audio: bool, debug: bool = False) -> bool:
+def download_video(video_id: str, path: Path | str, language: str, only_audio: bool, debug: bool = False) -> bool:
     path = Path(path)
 
     yt_opts: Dict[str, Any] = {
@@ -48,7 +56,7 @@ def download_video(video_id: str, path: Path | str, only_audio: bool, debug: boo
         data_info = ydl.sanitize_info(info)
         export_json( path / channel, title + ".json", data_info, timestamp = timestamp ) # type: ignore[reportArgumentType] # -> ydl.sanitize_info(info)
 
-        available_tracks = analyse_data( info, title )
+        available_tracks = analyse_data( info, title, language )
         if only_audio:
             audio = available_tracks["audio"]["mp4a"]
             format = f"{audio}"

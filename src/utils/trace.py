@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 22.02.2025
+    © Jürgen Schoenemeyer, 24.02.2025
 
     src/utils/trace.py
 
@@ -33,7 +33,6 @@
       - Color.<color_name>
       - Color.clear(text: str) -> str:
 """
-
 from __future__ import annotations
 
 import importlib.util
@@ -44,10 +43,8 @@ import sys
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Dict, List
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Dict, List, override
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
-
-from typing_extensions import override
 
 if TYPE_CHECKING:
     from types import FrameType

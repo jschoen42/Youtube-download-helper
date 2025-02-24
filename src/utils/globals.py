@@ -8,7 +8,6 @@
      - BASE_PATH: Path
      - SYSTEM_ENV_PATHS: List[str]
 """
-
 from __future__ import annotations
 
 import os

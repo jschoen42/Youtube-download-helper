@@ -1,3 +1,14 @@
+"""
+    © Jürgen Schoenemeyer, 24.02.2025
+
+    src/helper/analyse.py
+
+    PUBLIC:
+    - analyse_json_all(path: Path, language: str = "de" ) -> None
+    - analyse_json(path: Path, filename: str, language: str = "de" ) -> None
+    - analyse_data(data: Dict[str, Any], name: str = "", language: str = "de") -> Dict[str, Any]
+
+"""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict, List  # , cast
@@ -10,12 +21,12 @@ if TYPE_CHECKING:
 
 # yt-dlp https://www.youtube.com/watch?v=37SpumiGHgE --list-formats
 
-def analyse_json_all( path: Path, language: str = "de" ) -> None:
+def analyse_json_all(path: Path, language: str = "de") -> None:
     files, _ = listdir_match_extention( path, ["json"] )
     for file in files:
         analyse_json( path, file, language )
 
-def analyse_json( path: Path, filename: str, language: str = "de" ) -> None:
+def analyse_json(path: Path, filename: str, language: str = "de") -> None:
     data = import_json( path, filename )
     if data is None:
         return
@@ -23,7 +34,7 @@ def analyse_json( path: Path, filename: str, language: str = "de" ) -> None:
     _result = analyse_data( data, filename, language )
     # Trace.result( result )
 
-def analyse_data( data: Dict[str, Any], name: str = "", language: str = "de" ) -> Dict[str, Any]:
+def analyse_data(data: Dict[str, Any], name: str = "", language: str = "de") -> Dict[str, Any]:
 
     # pass 1 - find all I
 
