@@ -1,17 +1,19 @@
-# pwsh: .venv/Scripts/activate
-# bash: source .venv/Scripts/activate
-# deactivate
+"""
+    © Jürgen Schoenemeyer, 01.03.2025 18:41
 
-# python src/main.py
-# python src/main.py -id rU5mxh5tsI0
-# python src/main.py -a -id zqgbJq3T8Qo
+    src/utils/main.py
 
-# uv run src/main.py
-# uv run src/main.py -id rU5mxh5tsI0
-# uv run src/main.py -a zqgbJq3T8Qo
+    .venv/Scripts/activate
 
-# uv run python src/main.py
-# uv run python src/main.py -a
+    python src/main.py
+    python src/main.py -id rU5mxh5tsI0
+    python src/main.py -a -id zqgbJq3T8Qo
+
+    uv run src/main.py
+    uv run src/main.py -id rU5mxh5tsI0
+    uv run src/main.py -a zqgbJq3T8Qo
+"""
+from __future__ import annotations
 
 import sys
 
@@ -46,7 +48,6 @@ def main(youtube_id: str, language: str, audio: bool, debug: bool) -> None:
 if __name__ == "__main__":
     Trace.set(debug_mode=False, timezone=False)
     Trace.action(f"Python version {sys.version}")
-    Trace.action(f"BASE_PATH: '{BASE_PATH.resolve()}'")
 
     try:
         main()

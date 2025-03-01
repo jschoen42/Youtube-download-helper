@@ -1,5 +1,12 @@
-# .venv/Scripts/activate
-# python src/analyse.py
+"""
+    © Jürgen Schoenemeyer, 01.03.2025 18:41
+
+    src/utils/analyse.py
+
+    .venv/Scripts/activate
+    python src/analyse.py
+"""
+from __future__ import annotations
 
 import sys
 

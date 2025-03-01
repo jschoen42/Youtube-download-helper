@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 01.03.2025 18:32
+    © Jürgen Schoenemeyer, 01.03.2025 18:41
 
     src/helper/analyse.py
 
@@ -186,9 +186,9 @@ def analyse_data(data: Dict[str, Any], name: str = "", language: str = "de") -> 
         videos_sorted[key] = dict(sorted(value.items(), key=lambda item: item[1]["tbr"])) # type: ignore[call-overload]
 
     audios_sorted: Dict[str, Any] = {}
-    for lang in audios:
+    for lang, value in audios.items():
         audios_sorted[lang] = {}
-        for key, audio_data in audios[lang].items():
+        for key, audio_data in value.items():
             audios_sorted[lang][key] = dict(sorted(audio_data.items(), key=lambda item: item[1]["tbr"])) # type: ignore[call-overload]
 
     # all video tracks
