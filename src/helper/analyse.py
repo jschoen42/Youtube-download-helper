@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 24.02.2025
+    © Jürgen Schoenemeyer, 01.03.2025 18:32
 
     src/helper/analyse.py
 
@@ -7,7 +7,6 @@
     - analyse_json_all(path: Path, language: str = "de" ) -> None
     - analyse_json(path: Path, filename: str, language: str = "de" ) -> None
     - analyse_data(data: Dict[str, Any], name: str = "", language: str = "de") -> Dict[str, Any]
-
 """
 from __future__ import annotations
 

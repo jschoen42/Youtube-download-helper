@@ -21,8 +21,8 @@ from helper.youtube import download_video
 from utils.globals import BASE_PATH
 from utils.trace import Trace
 
-DEST_VIDEO = BASE_PATH / "result" / "video"
-DEST_AUDIO = BASE_PATH / "result" / "audio"
+DEST_VIDEO = BASE_PATH / "data" / "video"
+DEST_AUDIO = BASE_PATH / "data" / "audio"
 
 def validate_id(_ctx: click.Context, _param: click.Parameter, value: str) -> str:
     if len(value) != 11:

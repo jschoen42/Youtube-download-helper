@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 24.02.2025
+    © Jürgen Schoenemeyer, 01.03.2025 15:26
 
     src/utils/trace.py
 
@@ -40,6 +40,7 @@ import inspect
 import platform
 import re
 import sys
+
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
@@ -129,7 +130,9 @@ pattern: Dict[str, str] = {
     "debug":     "DEBUG", # only in debug mode
     "wait":      "WAIT ", # only in debug mode
 
-    "clear":     " $$$ ", # only internal (for decorator, ...) - •••
+    "clear":     " §§§ ", # only internal (for decorator, ...)
+    #"clear":    " 🕑  ",
+
 }
 
 class Trace:
@@ -325,7 +328,7 @@ class Trace:
                             termios.TCSADRAIN,                 # type: ignore[attr-defined] # -> Windows
                             old_settings,
                         )
-                        print()
+                        print()  # noqa: T201
 
                 if key == b"\x1b":
                     sys.exit()
