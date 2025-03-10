@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 01.03.2025 18:41
+    © Jürgen Schoenemeyer, 10.03.2025 13:55
 
     src/helper/analyse.py
 
@@ -179,6 +179,16 @@ def analyse_data(data: Dict[str, Any], name: str = "", language: str = "de") -> 
         },
         ...
     }
+
+    quality
+     - 0: 256x144
+     - 5: 426x240
+     - 6: 640x360
+     - 7: 854x489
+     - 8: 1280x720
+     - 9: 1920x1080
+     -10: 2560x1440
+     -11: 3840x2160
     """
 
     videos_sorted: Dict[str, Any] = {}

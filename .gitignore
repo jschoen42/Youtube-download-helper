@@ -7,7 +7,7 @@ data/*
 wav/*
 !wav/.gitkeep
 
-__history.txt
+_history/*
 _trace*/*
 _old/*
 
@@ -17,7 +17,8 @@ _old/*
 .timestamps.json
 .Python31?-*
 
-pre-commit-exclude.toml
+/.githooks.toml
+/.windsurfrules
 
 ### General
 .env

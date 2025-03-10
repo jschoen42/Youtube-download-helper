@@ -49,8 +49,11 @@ ignore = [
     "PLR0913", # too-many-arguments
     "PLR0915", # too-many-statements
     "PLR2004", # magic-value-comparison
-
+    "PLR2044", # empty-comment
     "PLW0603", # global-statement
+
+    # flake8-use-pathlib
+    "PTH208",  # os-listdir
 
     # flake8-return
     "RET504",  # unnecessary-assign
@@ -62,6 +65,7 @@ ignore = [
     "RUF100",  # unused-noqa
 
     # flake8-bandit
+    "S101",    # assert
     "S311",    # suspicious-non-cryptographic-random-usage
     "S324",    # hashlib-insecure-hash-function
     "S603",    # subprocess-without-shell-equals-true
@@ -75,10 +79,17 @@ ignore = [
 
     # tryceratops
     "TRY002",  # raise-vanilla-class
+    "TRY300",  # try-consider-else
 
     # pyupgrade
     "UP006",   # non-pep585-annotation
     "UP035",   # deprecated-import
+]
+
+[lint.per-file-ignores]
+"tests/*" = [
+    # flake8-pytest-style
+    "PT012",   # pytest-raises-with-multiple-statements
 ]
 
 [lint.isort]

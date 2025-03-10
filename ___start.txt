@@ -8,6 +8,5 @@ uv run src/main.py
 uv run src/main.py -id rU5mxh5tsI0
 uv run src/main.py -id zqgbJq3T8Qo -a
 
-
 uv run _pyright.py src
 uv run _mypy.py src

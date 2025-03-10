@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 01.03.2025 15:26
+    © Jürgen Schoenemeyer, 14.03.2025 17:59
 
     src/utils/file.py
 
@@ -25,7 +25,7 @@
      - delete_file(path: Path | str, filename: str) -> bool:
      - beautify_path( path: Path | str ) -> str:
 
-     #
+    #
      - get_trace_path(filepath: Path | str) -> str:
      - get_files_in_folder(path: Path) -> List[str]
      - get_folders_in_folder(path: Path) -> List[str]
@@ -147,13 +147,13 @@ def listdir_match_extention(path: Path | str, extensions: List[str]) -> Tuple[Li
             Trace.warning(f"skip temp file '{file}'")
             continue
 
-        if Path.is_file(path / file):
+        if (path / file).is_file():
             for extention in extensions:
                 if extention == "*" or file.endswith("." + extention):
                     files.append(file)
                     break
 
-        elif Path.is_dir(path / file):
+        elif (path / file).is_dir():
             folders.append(file)
 
         else:
@@ -167,7 +167,7 @@ def list_folders(path: Path | str) -> List[str]:
     folders: List[str] = []
     try:
         for file in os.listdir(path):
-            if Path.is_dir(path / file):
+            if (path / file).is_dir():
                 folders.append(file)
     except OSError as err:
         Trace.error(f"{err}")
@@ -185,7 +185,7 @@ def clear_folder(path: Path | str) -> None:
         except OSError as err:
             error = str(err).split(":")[0]
             try:
-                Path.unlink(filepath)
+                filepath.unlink()
             except OSError:
                 Trace.fatal( f"shutil.rmtree {error} '{get_trace_path(filepath)}'")
 
@@ -193,7 +193,7 @@ def delete_folder_tree(dest_path: Path | str, relax: bool = False) -> bool:
     dest_path = Path(dest_path)
 
     ret = False
-    if Path.exists(dest_path):
+    if dest_path.exists():
         try:
             shutil.rmtree(dest_path)
             ret = True
@@ -236,12 +236,12 @@ def delete_file(path: Path | str, filename: str) -> bool:
         try:
             filepath.unlink()
             Trace.update(f"file '{filepath}' deleted")
+            return True
 
         except OSError as err:
             Trace.error(f"{err}")
-            return False
 
-    return True
+    return False
 
 def beautify_path( path: Path | str ) -> str:
     return str( path ).replace("\\\\", "/")
@@ -263,10 +263,12 @@ def get_trace_path(filepath: Path | str) -> str:
 
 
 def get_files_in_folder( path: Path | str ) -> List[str]:
-    return [f for f in os.listdir(path) if (Path(path) / f).is_file()]
+    path = Path(path)
+    return [f for f in os.listdir(path) if (path / f).is_file()]
 
 def get_folders_in_folder( path: Path | str ) -> List[str]:
-    return [f for f in os.listdir(path) if (Path(path) / f).is_dir()]
+    path = Path(path)
+    return [f for f in os.listdir(path) if (path / f).is_dir()]
 
 def get_save_filename( path: Path | str, stem: str, suffix: str ) -> str:
     files: List[str] = get_files_in_folder( Path(path) )
@@ -282,7 +284,7 @@ def import_text( folderpath: Path | str, filename: Path | str, encoding: str="ut
 
     if filepath.is_file():
         try:
-            with Path.open(filepath, mode="r", encoding=encoding) as file:
+            with filepath.open(mode="r", encoding=encoding) as file:
                 data = file.read()
 
         except OSError as error:
@@ -321,7 +323,7 @@ def export_text(folderpath: Path | str, filename: str, text: str, encoding: str=
 
     exist = False
     try:
-        with Path.open(filepath, mode="r", encoding=encoding) as file:
+        with filepath.open(mode="r", encoding=encoding) as file:
             text_old = file.read()
             exist = True
     except OSError:
@@ -337,7 +339,7 @@ def export_text(folderpath: Path | str, filename: str, text: str, encoding: str=
         create_folder(folderpath)
 
     try:
-        with Path.open(filepath, mode="w", encoding=encoding, newline=newline) as file:
+        with filepath.open(mode="w", encoding=encoding, newline=newline) as file:
             file.write(text)
 
         if timestamp != 0:
@@ -365,11 +367,11 @@ def export_binary_file(filepath: Path | str, filename: str, data: bytes, _timest
     filepath = Path(filepath)
 
     if create_new_folder:
-        if not Path.is_dir(filepath):
+        if not filepath.is_dir():
             filepath.mkdir(parents=True)
             Trace.update( f"makedir '{filepath}'")
 
-    with Path.open(Path(filepath, filename), mode="wb") as binary_file:
+    with (filepath / filename).open(mode="wb") as binary_file:
         binary_file.write(data)
 
 def export_file(filepath: Path | str, filename: str, text: str, in_type: str | None = None, encoding: str ="utf-8", newline: str="\n",timestamp: float=0.0, create_new_folder: bool=True, overwrite: bool=True) -> None | str:
@@ -401,7 +403,7 @@ def export_file(filepath: Path | str, filename: str, text: str, in_type: str | N
         my_filename = dest2 + copy + "." + ext
 
     try:
-        with Path.open(filepath / my_filename, mode="r", encoding=encoding) as file:
+        with (filepath / my_filename).open(mode="r", encoding=encoding) as file:
             ref_text = file.read()
     except OSError:
         ref_text = ""
@@ -428,7 +430,7 @@ def export_file(filepath: Path | str, filename: str, text: str, in_type: str | N
                     return None
 
         try:
-            with Path.open(filepath / my_filename, mode="w", encoding=encoding, newline=newline) as file:
+            with (filepath / my_filename).open(mode="w", encoding=encoding, newline=newline) as file:
                 file.write(text)
 
             if timestamp != 0:
@@ -479,7 +481,7 @@ def get_filename_unique(dirpath: Path, filename: str) -> str:
 
     number = 1
     append = ""
-    while Path.is_file(dirpath / (stem + append + suffix)):
+    while (dirpath / (stem + append + suffix)).is_file():
         number += 1
         append = "_[" + str(number) + "]"
 
@@ -525,7 +527,7 @@ def get_file_infos(path: Path | str, filename: str, _in_type: str) -> None | Dic
     filepath = Path(path, filename)
 
     if filepath.is_file():
-        with Path.open(filepath, mode="rb") as file:
+        with filepath.open(mode="rb") as file:
             md5 = hashlib.md5(file.read()).hexdigest()  # noqa: S324
 
         size           = filepath.stat().st_size

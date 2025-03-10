@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 01.03.2025 16:19
+    © Jürgen Schoenemeyer, 15.03.2025 20:19
 
     _mypy.py
 
@@ -31,7 +31,6 @@
 from __future__ import annotations
 
 import json
-import locale
 import platform
 import re
 import shutil
@@ -78,7 +77,8 @@ def run_mypy(src_path: Path, python_version: str) -> None:
 
     if python_version == "":
         try:
-            with Path.open(Path(".python-version"), mode="r") as f:
+            filename = Path(".python-version")
+            with filename.open(mode="r") as f:
                 python_version = f.read().strip()
         except OSError:
             python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
@@ -230,7 +230,7 @@ def run_mypy(src_path: Path, python_version: str) -> None:
 
     text  = f"Python:   {sys.version.replace(LINEFEET, ' ')}\n"
     text += f"Platform: {platform.platform()}\n"
-    text += f"Date:     {datetime.now().astimezone().strftime('%d.%m.%Y %H:%M:%S')}\n"
+    text += f"Date:     {datetime.now().astimezone():%d.%m.%Y %H:%M:%S}\n"
     text += f"Path:     {BASE_PATH}\n"
     text += "\n"
 
@@ -241,7 +241,7 @@ def run_mypy(src_path: Path, python_version: str) -> None:
     text += "\n"
 
     config = Path("tmp.toml")
-    with Path.open(config, mode="w", newline="\n") as config_file:
+    with config.open(mode="w", newline="\n") as config_file:
         config_file.write(configuration)
 
     try:
@@ -254,13 +254,15 @@ def run_mypy(src_path: Path, python_version: str) -> None:
             [mypy_path, str(src_path), "--config-file", "tmp.toml", "--verbose", "--output=json", *settings],
             capture_output=True,
             text=True,
-            check=False,
+            check=False, # important
+            encoding="utf-8",
+            errors="replace",
         )
     except subprocess.CalledProcessError as err:
-        print(f"error: {err} - mypy")
+        print(f"mypy error: {err}")
         sys.exit(1)
     finally:
-        Path.unlink(config)
+        config.unlink()
 
     # analyse stderr ("--verbose")
 
@@ -270,8 +272,7 @@ def run_mypy(src_path: Path, python_version: str) -> None:
     # ...
     # LOG:  Metadata fresh for __main__: file src\__init__.py
 
-    codepage = locale.getpreferredencoding() # cp1252 ...
-    stderr = result.stderr.encode(encoding=codepage).decode(encoding="utf-8").replace("\xa0", " ")
+    stderr = result.stderr
 
     sources: List[str] = []
     version = ""
@@ -300,7 +301,7 @@ def run_mypy(src_path: Path, python_version: str) -> None:
 
     mypy_missing_stubs = Path(".mypy_cache") / "missing_stubs"
     if mypy_missing_stubs.exists():
-        with Path.open(mypy_missing_stubs, "r") as f:
+        with mypy_missing_stubs.open(mode="r") as f:
             lines = f.read()
 
         text += f"stubs missing -> '{mypy_missing_stubs.as_posix()}'\n"
@@ -382,8 +383,8 @@ def run_mypy(src_path: Path, python_version: str) -> None:
             last_file = file
             msg_files += 1
 
-        pre = f"{file}:{data["line"]}:{data["column"]+1}" # column 0-based
-        text += f"{pre} {severity}: {data["message"]}"
+        pre = f"{file}:{data['line']}:{data['column']+1}" # column 0-based
+        text += f"{pre} {severity}: {data['message']}"
         if severity != "note":
             text += f" [{message_type}]\n"
         else:
@@ -410,7 +411,7 @@ def run_mypy(src_path: Path, python_version: str) -> None:
     text += "\n" + footer + "\n"
 
     result_filename = f"mypy-{python_version}-'{name}'.txt"
-    with Path.open(folder_path / result_filename, "w", newline="\n") as f:
+    with (folder_path / result_filename).open(mode="w", newline="\n") as f:
         f.write(text)
 
     duration = time.time() - start

@@ -1,18 +1,23 @@
 """
-    © Jürgen Schoenemeyer, 24.02.2025
+    © Jürgen Schoenemeyer, 10.03.2025 15:03
 
     src/helper/youtube.py
 
     PUBLIC:
      - download_video(video_id: str, path: Path | str, language: str, only_audio: bool, debug: bool = False) -> bool
+
+    PRIVATE:
+     - valid_filename_utf16( text: str ) -> str
 """
 from __future__ import annotations
 
 import time
+
 from pathlib import Path
 from typing import Any, Dict
 
 import yt_dlp  # type: ignore[import-untyped]
+
 from yt_dlp.utils import DownloadError  # type: ignore[import-untyped]
 
 from helper.analyse import analyse_data
@@ -49,8 +54,8 @@ def download_video(video_id: str, path: Path | str, language: str, only_audio: b
             if info is None:
                 return False
 
-            title     = valid_filename(str(info["title"]))
-            channel   = valid_filename(str(info["channel"]))
+            title     = valid_filename_utf16(str(info["title"]))
+            channel   = valid_filename_utf16(str(info["channel"]))
             timestamp = float(str(info["timestamp"]))
 
         data_info = ydl.sanitize_info(info)
@@ -113,19 +118,18 @@ def download_video(video_id: str, path: Path | str, language: str, only_audio: b
         return False
 
 
-def valid_filename( text: str ) -> str:
+def valid_filename_utf16( text: str ) -> str:
 
     convert = {
-        "<": "˂",  # U+027C
-        ">": "˃",  # U+027D
-        ":": "：",  # U+3014
-        '"': "'",
-        "/": "∕",  # U+2215
-        "|": "｜",  # U+2663
-        "?": "？",  # U+3013
-        "*": "˄",  # U+02C4
-
-        "\\": "_",
+        "<":  "\uff1c", # "＜" -> Fullwidth Less-Than Sign    - alternative: "\u02c2" -> "˂" -> Modifier Letter Left Arrowhead
+        ">":  "\uff1e", # "＞" -> Fullwidth Greater-Than Sign - alternative: "\u02c3" -> "˃" -> Modifier Letter Right Arrowhead
+        ":":  "\uff1a", # "：" -> Fullwidth Colon
+        "/":  "\uff0f", # "／" -> Fullwidth Solidus           - alternative: "\u2215" -> "∕" -> Division Slash
+        "|":  "\uff5c", # "｜" -> Fullwidth Vertical Line
+        "?":  "\uff1f", # "？" -> Fullwidth Question Mark
+        "*":  "\uff0a", # "＊" -> Fullwidth Asterisk          - alternative: "\u204e" -> "⁎" -> Low Asterisk
+        "\\": "\uff3c", # "＼" -> Low Line
+        '"':  "\u0027", # "'" -> Apostrophe                   - alternative: "\u2233" -> "″" -> Double Prime
     }
 
     for x, y in convert.items():
