@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 10.03.2025 15:03
+    © Jürgen Schoenemeyer, 17.03.2025 20:33
 
     src/helper/youtube.py
 
@@ -83,7 +83,7 @@ def download_video(video_id: str, path: Path | str, language: str, only_audio: b
             "quiet":         True,
             "force-ipv6":    True,
             "format":        format,
-            "outtmpl":       str(path) + f"/%(uploader)s/%(title)s ({format}).%(ext)s",
+            "outtmpl":       str(path) + f"/%(uploader)s/{title} ({format}).%(ext)s",
 
             # "debug_printtraffic": True,
         }

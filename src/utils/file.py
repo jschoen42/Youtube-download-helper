@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 14.03.2025 17:59
+    © Jürgen Schoenemeyer, 16.03.2025 16:38
 
     src/utils/file.py
 
@@ -177,9 +177,7 @@ def list_folders(path: Path | str) -> List[str]:
 def clear_folder(path: Path | str) -> None:
     path = Path(path)
 
-    for filename in os.listdir(path):
-        filepath = path / filename
-
+    for filepath in path.iterdir():
         try:
             shutil.rmtree(filepath)
         except OSError as err:
@@ -215,8 +213,8 @@ def create_folder( folderpath: Path | str ) -> bool:
             folderpath.mkdir(parents=True)
             Trace.update( f"makedir: {folderpath}")
 
-        except OSError as error:
-            error_msg = str(error).split(":")[0]
+        except OSError as err:
+            error_msg = str(err).split(":")[0]
             Trace.error( f"{error_msg}: {folderpath}")
             return False
 
@@ -287,12 +285,12 @@ def import_text( folderpath: Path | str, filename: Path | str, encoding: str="ut
             with filepath.open(mode="r", encoding=encoding) as file:
                 data = file.read()
 
-        except OSError as error:
-            Trace.error(f"{error}")
+        except OSError as err:
+            Trace.error(f"{err}")
             return None
 
-        except UnicodeDecodeError as error:
-            Trace.error(f"{filepath}: {error}")
+        except UnicodeDecodeError as err:
+            Trace.error(f"{filepath}: {err}")
             return None
 
         return data
@@ -353,8 +351,8 @@ def export_text(folderpath: Path | str, filename: str, text: str, encoding: str=
 
         return str(filename)
 
-    except OSError as error:
-        error_msg = str(error).split(":")[0]
+    except OSError as err:
+        error_msg = str(err).split(":")[0]
         Trace.error(f"{error_msg} - {filepath}")
         return None
 
@@ -371,8 +369,8 @@ def export_binary_file(filepath: Path | str, filename: str, data: bytes, _timest
             filepath.mkdir(parents=True)
             Trace.update( f"makedir '{filepath}'")
 
-    with (filepath / filename).open(mode="wb") as binary_file:
-        binary_file.write(data)
+    with (filepath / filename).open(mode="wb") as f:
+        f.write(data)
 
 def export_file(filepath: Path | str, filename: str, text: str, in_type: str | None = None, encoding: str ="utf-8", newline: str="\n",timestamp: float=0.0, create_new_folder: bool=True, overwrite: bool=True) -> None | str:
     filepath = Path(filepath)
@@ -403,8 +401,8 @@ def export_file(filepath: Path | str, filename: str, text: str, in_type: str | N
         my_filename = dest2 + copy + "." + ext
 
     try:
-        with (filepath / my_filename).open(mode="r", encoding=encoding) as file:
-            ref_text = file.read()
+        with (filepath / my_filename).open(mode="r", encoding=encoding) as f:
+            ref_text = f.read()
     except OSError:
         ref_text = ""
 
@@ -430,8 +428,8 @@ def export_file(filepath: Path | str, filename: str, text: str, in_type: str | N
                     return None
 
         try:
-            with (filepath / my_filename).open(mode="w", encoding=encoding, newline=newline) as file:
-                file.write(text)
+            with (filepath / my_filename).open(mode="w", encoding=encoding, newline=newline) as f:
+                f.write(text)
 
             if timestamp != 0:
                 set_modification_timestamp(filepath / my_filename, timestamp)
