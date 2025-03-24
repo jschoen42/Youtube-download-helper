@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 10.03.2025 13:55
+    © Jürgen Schoenemeyer, 24.03.2025 21:52
 
     src/helper/analyse.py
 
@@ -10,7 +10,7 @@
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List  # , cast
+from typing import TYPE_CHECKING, Any, Dict, List
 
 from utils.file import import_json, listdir_match_extention
 from utils.trace import Trace
@@ -81,10 +81,10 @@ def analyse_data(data: Dict[str, Any], name: str = "", language: str = "de") -> 
 
         elif acodec != "none":
             type = acodec.split(".")[0]
-            if "language" in format:
+            if format.get("language"):
                 lang = format["language"].split("-")[0]
             else:
-                lang = "unkwown"
+                lang = "unknown"
 
             if lang not in audios:
                 audios[lang] = {}

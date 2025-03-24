@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 15.03.2025 20:19
+    © Jürgen Schoenemeyer, 23.03.2025 15:33
 
     _mypy.py
 
@@ -21,8 +21,8 @@
      - uv run _mypy.py src
      - uv run _mypy.py src/main.py
 
-    PUBLIC:
-     - run_mypy(src_path: Path, python_version: str) -> None
+    MAIN:
+     - check_types(src_path: Path, python_version: str) -> None
 
     PRIVAT:
      - format_singular_plural(value: int, text: str) -> str
@@ -51,7 +51,7 @@ RESULT_FOLDER = ".type-check-result"
 
 LINEFEET = "\n"
 
-# temp.toml
+CONFIG_FILE = "_mypy.tmp.toml"
 
 CONFIG = \
 """
@@ -73,7 +73,7 @@ def format_singular_plural(value: int, text: str) -> str:
         return f"{value} {text}"
     return f"{value} {text}s"
 
-def run_mypy(src_path: Path, python_version: str) -> None:
+def check_types(src_path: Path, python_version: str) -> None:
 
     if python_version == "":
         try:
@@ -90,8 +90,7 @@ def run_mypy(src_path: Path, python_version: str) -> None:
 
     settings: List[str] = [
 
-        "--sqlite-cache",                 # default: False
-        "--namespace-packages",
+        "--sqlite-cache",
 
         ### Import discovery
         "--namespace-packages",           # default: True
@@ -218,7 +217,7 @@ def run_mypy(src_path: Path, python_version: str) -> None:
         print(f"Error: path '{src_path}' not found ")
         return
 
-    start = time.time()
+    start = time.perf_counter()
 
     name = src_path.stem
     if name == "":
@@ -240,7 +239,7 @@ def run_mypy(src_path: Path, python_version: str) -> None:
         text += f" {setting}\n"
     text += "\n"
 
-    config = Path("tmp.toml")
+    config = Path(CONFIG_FILE)
     with config.open(mode="w", newline="\n") as config_file:
         config_file.write(configuration)
 
@@ -251,7 +250,7 @@ def run_mypy(src_path: Path, python_version: str) -> None:
             sys.exit(1)
 
         result: CompletedProcess[str] = subprocess.run(
-            [mypy_path, str(src_path), "--config-file", "tmp.toml", "--verbose", "--output=json", *settings],
+            [mypy_path, str(src_path), "--config-file", CONFIG_FILE, *settings, "--verbose", "--output=json"],
             capture_output=True,
             text=True,
             check=False, # important
@@ -414,7 +413,7 @@ def run_mypy(src_path: Path, python_version: str) -> None:
     with (folder_path / result_filename).open(mode="w", newline="\n") as f:
         f.write(text)
 
-    duration = time.time() - start
+    duration = time.perf_counter() - start
     print(f"[MyPy {version} ({duration:.2f} sec)] {footer} -> {RESULT_FOLDER}/{result_filename}")
     sys.exit(result.returncode)
 
@@ -426,7 +425,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     try:
-        run_mypy(Path(args.path), args.version)
+        check_types(Path(args.path), args.version)
     except KeyboardInterrupt:
         print(" --> KeyboardInterrupt")
         sys.exit(1)

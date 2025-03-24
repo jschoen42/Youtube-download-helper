@@ -1,0 +1,7 @@
+youtube-download-helper v0.1.2
+├── click v8.1.8
+│   └── colorama v0.4.6
+├── yt-dlp v2025.3.21
+└── mypy v1.15.0 (group: dev)
+    ├── mypy-extensions v1.0.0
+    └── typing-extensions v4.12.2

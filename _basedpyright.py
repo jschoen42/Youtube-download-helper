@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 15.03.2025 20:19
+    © Jürgen Schoenemeyer, 23.03.2025 15:33
 
     _basedpyright.py
 
@@ -49,12 +49,14 @@ RESULT_FOLDER = ".type-check-result"
 
 LINEFEET = "\n"
 
+CONFIG_FILE = "_basedpyright.tmp.json"
+
 def format_singular_plural(value: int, text: str) -> str:
     if value == 1:
         return f"{value} {text}"
     return f"{value} {text}s"
 
-def run_basedpyright(src_path: Path, python_version: str) -> None:
+def check_types(src_path: Path, python_version: str) -> None:
 
     if python_version == "":
         try:
@@ -112,7 +114,7 @@ def run_basedpyright(src_path: Path, python_version: str) -> None:
         print(f"Error: path '{src_path}' not found")
         return
 
-    start = time.time()
+    start = time.perf_counter()
 
     folder_path = BASE_PATH / RESULT_FOLDER
     if not folder_path.exists():
@@ -132,7 +134,7 @@ def run_basedpyright(src_path: Path, python_version: str) -> None:
     for key, value in settings.items():
         text += f" - {key}: {value}\n"
 
-    config = Path("tmp.json")
+    config = Path(CONFIG_FILE)
     with config.open(mode="w", newline="\n") as config_file:
         json.dump(settings, config_file, indent=2)
 
@@ -258,7 +260,7 @@ def run_basedpyright(src_path: Path, python_version: str) -> None:
     with (folder_path / result_filename).open(mode="w", newline="\n") as f:
         f.write(text)
 
-    duration = time.time() - start
+    duration = time.perf_counter() - start
     print(f"[BasedPyRight {version} ({duration:.2f} sec)] {footer} -> {RESULT_FOLDER}/{result_filename}")
     sys.exit(result.returncode)
 
@@ -270,7 +272,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     try:
-        run_basedpyright(Path(args.path), args.version)
+        check_types(Path(args.path), args.version)
     except KeyboardInterrupt:
         print(" --> KeyboardInterrupt")
         sys.exit(1)

@@ -1,9 +1,9 @@
 """
-    © Jürgen Schoenemeyer, 12.03.2025 16:31
+    © Jürgen Schoenemeyer, 22.03.2025 10:40
 
     src/utils/trace.py
 
-    class Trace:
+    static class Trace:
       - Trace.set(debug_mode=True)
       - Trace.set(reduced_mode=True)
       - Trace.set(color=False)
@@ -31,7 +31,7 @@
 
       - Trace.redirect(function) # -> e.g. qDebug (PySide6)
 
-    class Color:
+    static class Color:
       - Color.<color_name>
       - Color.clear(text: str) -> str:
 """
@@ -152,7 +152,8 @@ class Trace:
     output: Callable[..., None] | None = None
 
     @classmethod
-    def set(cls, **kwargs: Any) -> None:
+    def set(cls, **kwargs: Any) -> None: # color, reduced_mode, debug_mode, show_timestamp, timezone, show_caller
+
         for key, value in kwargs.items():
             if key in cls.settings:
                 cls.settings[key] = value
