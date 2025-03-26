@@ -1,16 +1,28 @@
 """
-    © Jürgen Schoenemeyer, 24.03.2025 21:52
+    © Jürgen Schoenemeyer, 26.03.2025 19:56
 
     src/helper/analyse.py
 
     PUBLIC:
-    - analyse_json_all(path: Path, language: str = "de" ) -> None
-    - analyse_json(path: Path, filename: str, language: str = "de" ) -> None
-    - analyse_data(data: Dict[str, Any], name: str = "", language: str = "de") -> Dict[str, Any]
+    - analyse_json_all( path: Path ) -> None
+    - analyse_json( path: Path, filename: str ) -> None
+
+    - analyse_data( data: Dict[str, Any], name: str = "") -> Dict[str, Any]
+        {
+            'language': 'en',
+            'video': {
+                'vp09': ['614', 8],
+                'avc1': ['270', 8],
+            },
+            'audio': {
+                'opus': ['251-5', 3],
+                'mp4a': ['140-5', 3],
+            }
+        }
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TYPE_CHECKING, Any, Dict
 
 from utils.file import import_json, listdir_match_extention
 from utils.trace import Trace
@@ -20,20 +32,19 @@ if TYPE_CHECKING:
 
 # yt-dlp https://www.youtube.com/watch?v=37SpumiGHgE --list-formats
 
-def analyse_json_all(path: Path, language: str = "de") -> None:
+def analyse_json_all(path: Path) -> None:
     files, _ = listdir_match_extention( path, ["json"] )
     for file in files:
-        analyse_json( path, file, language )
+        analyse_json( path, file )
 
-def analyse_json(path: Path, filename: str, language: str = "de") -> None:
+def analyse_json(path: Path, filename: str) -> None:
     data = import_json( path, filename )
     if data is None:
         return
 
-    _result = analyse_data( data, filename, language )
-    # Trace.result( result )
+    _result = analyse_data( data, filename )
 
-def analyse_data(data: Dict[str, Any], name: str = "", language: str = "de") -> Dict[str, Any]:
+def analyse_data(data: Dict[str, Any], name: str = "") -> Dict[str, Any]:
 
     # pass 1 - find all I
 
@@ -45,7 +56,6 @@ def analyse_data(data: Dict[str, Any], name: str = "", language: str = "de") -> 
 
     audios: Dict[str, Any] = {} # mp4a, opus, ac-3, ec-3
     videos: Dict[str, Any] = {} # avc1, vp09, av01
-    combined: List[str] = []
 
     original_language = None
 
@@ -58,33 +68,57 @@ def analyse_data(data: Dict[str, Any], name: str = "", language: str = "de") -> 
 
     formats = data["formats"]
 
-    # find the highest datarate for each codec
+    # pass 1: check for 'pref'
 
-    formats = data["formats"]
+    use_language_pref = False
     for format in formats:
-        id = format["format_id"]
-
-        note = format.get("format_note", "" )
-
-        if "DRC" in note:
+        protokoll = format["protocol"]
+        if protokoll != "https":
             continue
+
+        lang_pref = format.get("language_preference", -1)
+        if lang_pref>0:
+            use_language_pref = True
+            break
+
+    # pass 2: find the highest data rate for each codec
+
+    for format in formats:
+        protokoll = format["protocol"]
+        if protokoll in {"mhtml", "m3u8_native"}:
+            continue
+
+        if protokoll != "https":
+            Trace.error(f"unknown protokoll '{protokoll}'")
+
+        id = format["format_id"]
 
         acodec = format.get("acodec", "none")
         vcodec = format.get("vcodec", "none")
 
-        # combined Audio + Video (-> low quality)
+        # Audio + Video -> low quality
 
         if acodec != "none" and vcodec != "none":
-            combined.append(id)
+            continue
 
-        # only Audio
+        # Audio
 
-        elif acodec != "none":
+        if acodec != "none":
+            lang_pref = format.get("language_preference", -1)
+            if use_language_pref and lang_pref<0:
+                continue
+
             type = acodec.split(".")[0]
             if format.get("language"):
                 lang = format["language"].split("-")[0]
             else:
                 lang = "unknown"
+
+            note = format.get("format_note", "" )  # "English (United States) original (default), medium",
+            if "DRC" in note:
+                continue
+            if "original" in note:
+                original_language = lang
 
             if lang not in audios:
                 audios[lang] = {}
@@ -94,6 +128,7 @@ def analyse_data(data: Dict[str, Any], name: str = "", language: str = "de") -> 
 
             audios[lang][type][id] = {
                 "codec":    acodec,
+                "pref":     lang_pref,
                 "tbr":      round(format["tbr"]),
                 "quality":  round(format["quality"]),
                 "channels": format["audio_channels"],
@@ -101,16 +136,10 @@ def analyse_data(data: Dict[str, Any], name: str = "", language: str = "de") -> 
                 "filesize": format.get("filesize"),
             }
 
-            if "original" in note:
-                original_language = lang
+        # Video
 
-        # only Video
-
-        elif vcodec != "none":
+        if vcodec != "none":
             type = vcodec.split(".")[0]
-            if type == "vp9":
-                type = "vp09"
-
             if type not in videos:
                 videos[type] = {}
 
@@ -124,119 +153,54 @@ def analyse_data(data: Dict[str, Any], name: str = "", language: str = "de") -> 
                 "filesize": format.get("filesize"),
             }
 
-        # Images
+    # all available video tracks
 
-        else:
-            continue
-
-    # if len(combined)>0:
-    #     Trace.warning( f"combined video + audio: {combined}\n" )
-
-    # sorted by "tbr" (total bitrate)
-
-    """
-    videos: {
-        'vp09': {
-            '602': {'codec': 'vp09.00.10.08', 'tbr':    93, 'quality':  0, 'width':  256, 'height':  144, 'fps': 15, 'filesize': None},
-            '603': {'codec': 'vp09.00.11.08', 'tbr':   169, 'quality':  0, 'width':  256, 'height':  144, 'fps': 30, 'filesize': None},
-            '278': {'codec': 'vp9',           'tbr':    71, 'quality':  0, 'width':  256, 'height':  144, 'fps': 30, 'filesize': 10016992},
-            '604': {'codec': 'vp09.00.20.08', 'tbr':   302, 'quality':  5, 'width':  426, 'height':  240, 'fps': 30, 'filesize': None},
-            '242': {'codec': 'vp9',           'tbr':   145, 'quality':  5, 'width':  426, 'height':  240, 'fps': 30, 'filesize': 20533477},
-            '605': {'codec': 'vp09.00.21.08', 'tbr':   765, 'quality':  6, 'width':  640, 'height':  360, 'fps': 30, 'filesize': None},
-            '243': {'codec': 'vp9',           'tbr':   345, 'quality':  6, 'width':  640, 'height':  360, 'fps': 30, 'filesize': 48873387},
-            '606': {'codec': 'vp09.00.30.08', 'tbr':  1177, 'quality':  7, 'width':  854, 'height':  480, 'fps': 30, 'filesize': None},
-            '244': {'codec': 'vp9',           'tbr':   503, 'quality':  7, 'width':  854, 'height':  480, 'fps': 30, 'filesize': 71316031},
-            '609': {'codec': 'vp09.00.31.08', 'tbr':  2171, 'quality':  8, 'width': 1280, 'height':  720, 'fps': 30, 'filesize': None},
-            '247': {'codec': 'vp9',           'tbr':  1053, 'quality':  8, 'width': 1280, 'height':  720, 'fps': 30, 'filesize': 149326182},
-            '614': {'codec': 'vp09.00.40.08', 'tbr':  3566, 'quality':  9, 'width': 1920, 'height': 1080, 'fps': 30, 'filesize': None},
-            '248': {'codec': 'vp9',           'tbr':  1656, 'quality':  9, 'width': 1920, 'height': 1080, 'fps': 30, 'filesize': 234733705},
-            '620': {'codec': 'vp09.00.50.08', 'tbr':  9511, 'quality': 10, 'width': 2560, 'height': 1440, 'fps': 30, 'filesize': None},
-            '271': {'codec': 'vp9',           'tbr':  7508, 'quality': 10, 'width': 2560, 'height': 1440, 'fps': 30, 'filesize': 1064199484},
-            '625': {'codec': 'vp09.00.50.08', 'tbr': 18853, 'quality': 11, 'width': 3840, 'height': 2160, 'fps': 30, 'filesize': None},
-            '313': {'codec': 'vp9',            tbr': 16995, 'quality': 11, 'width': 3840, 'height': 2160, 'fps': 30, 'filesize': 2409020956}
-        },
-
-           =>
-
-        'vp09': {
-            '278': {'codec': 'vp9',           'tbr':    71, 'quality':  0, 'width':  256, 'height':  144, 'fps': 30, 'filesize': 10016992},
-            '602': {'codec': 'vp09.00.10.08', 'tbr':    93, 'quality':  0, 'width':  256, 'height':  144, 'fps': 15, 'filesize': None},
-            '242': {'codec': 'vp9',           'tbr':   145, 'quality':  5, 'width':  426, 'height':  240, 'fps': 30, 'filesize': 20533477},
-            '603': {'codec': 'vp09.00.11.08', 'tbr':   169, 'quality':  0, 'width':  256, 'height':  144, 'fps': 30, 'filesize': None},
-            '604': {'codec': 'vp09.00.20.08', 'tbr':   302, 'quality':  5, 'width':  426, 'height':  240, 'fps': 30, 'filesize': None},
-            '243': {'codec': 'vp9',           'tbr':   345, 'quality':  6, 'width':  640, 'height':  360, 'fps': 30, 'filesize': 48873387},
-            '244': {'codec': 'vp9',           'tbr':   503, 'quality':  7, 'width':  854, 'height':  480, 'fps': 30, 'filesize': 71316031},
-            '605': {'codec': 'vp09.00.21.08', 'tbr':   765, 'quality':  6, 'width':  640, 'height':  360, 'fps': 30, 'filesize': None},
-            '247': {'codec': 'vp9',           'tbr':  1053, 'quality':  8, 'width': 1280, 'height':  720, 'fps': 30, 'filesize': 149326182},
-            '606': {'codec': 'vp09.00.30.08', 'tbr':  1177, 'quality':  7, 'width':  854, 'height':  480, 'fps': 30, 'filesize': None},
-            '248': {'codec': 'vp9',           'tbr':  1656, 'quality':  9, 'width': 1920, 'height': 1080, 'fps': 30, 'filesize': 234733705},
-            '609': {'codec': 'vp09.00.31.08', 'tbr':  2171, 'quality':  8, 'width': 1280, 'height':  720, 'fps': 30, 'filesize': None},
-            '614': {'codec': 'vp09.00.40.08', 'tbr':  3566, 'quality':  9, 'width': 1920, 'height': 1080, 'fps': 30, 'filesize': None},
-            '271': {'codec': 'vp9',           'tbr':  7508, 'quality': 10, 'width': 2560, 'height': 1440, 'fps': 30, 'filesize': 1064199484},
-            '620': {'codec': 'vp09.00.50.08', 'tbr':  9511, 'quality': 10, 'width': 2560, 'height': 1440, 'fps': 30, 'filesize': None},
-            '313': {'codec': 'vp9',           'tbr': 16995, 'quality': 11, 'width': 3840, 'height': 2160, 'fps': 30, 'filesize': 2409020956},
-            '625': {'codec': 'vp09.00.50.08', 'tbr': 18853, 'quality': 11, 'width': 3840, 'height': 2160, 'fps': 30, 'filesize': None}
-        },
-        ...
-    }
-
-    quality
-     - 0: 256x144
-     - 5: 426x240
-     - 6: 640x360
-     - 7: 854x489
-     - 8: 1280x720
-     - 9: 1920x1080
-     -10: 2560x1440
-     -11: 3840x2160
-    """
-
-    videos_sorted: Dict[str, Any] = {}
     for key, value in videos.items():
-        videos_sorted[key] = dict(sorted(value.items(), key=lambda item: item[1]["tbr"])) # type: ignore[call-overload]
-
-    audios_sorted: Dict[str, Any] = {}
-    for lang, value in audios.items():
-        audios_sorted[lang] = {}
-        for key, audio_data in value.items():
-            audios_sorted[lang][key] = dict(sorted(audio_data.items(), key=lambda item: item[1]["tbr"])) # type: ignore[call-overload]
-
-    # all video tracks
-
-    for key, value in videos_sorted.items():
+        Trace.debug()
         Trace.debug( f"video: {key}")
         for type, types in value.items():
             size = f"{types['width']}x{types['height']}"
-            Trace.debug( f"id: {type:3} - tbr: {types['tbr']:4} - size: {size:9} - codec: {types['codec']}")
+            Trace.debug( f"id: {type:3} - quality: {types['quality']:2} - tbr: {types['tbr']:4} - size: {size:9} - codec: {types['codec']}")
+
+    # video type -> vp09, avc1, av01
 
     video_best = {}
-    for type, value in videos_sorted.items():
-        video_best[type] = list(value.keys())[-1]
+    for type, value in videos.items(): # -> last entry
+        last    = list(value)[-1]
+        quality = videos[type][last]["quality"]
+        video_best[type] = [last, quality]
 
-    # all audio tracks
+    # all available audio tracks
 
-    for lang, data_lang in audios_sorted.items():
+    for lang, data_lang in audios.items():
         for key, value in data_lang.items():
+            Trace.debug()
             Trace.debug( f"audio: {lang} - {key}")
             for type, types in value.items():
-                Trace.debug( f"id: {type:3} - tbr: {types['tbr']:4} - codec: {types['codec']}")
+                Trace.debug( f"id: {type:3} - quality: {types['quality']:2} - tbr: {types['tbr']:4} - codec: {types['codec']} - pref: {types['pref']}")
 
-    if len( audios_sorted ) == 1:
-        language = next(iter(audios_sorted.keys()))
+    language = ""
+    if len( audios ) == 1:
+        language = next(iter(audios.keys()))
     elif original_language:
         language = original_language
 
+    # audio type -> opus, mp4a
+
     audio_best = {}
-    if language not in audios_sorted:
+    if language not in audios:
         Trace.error( f"language '{language}' not found" )
     else:
-        for type, value in audios_sorted[language].items():
-            audio_best[type] = list(value.keys())[-1]
+        for type, value in audios[language].items(): # -> last entry
+            last    = list(value)[-1]
+            quality = audios[language][type][last]["quality"]
+            audio_best[type] = [last, quality]
 
     result = {
         "language": language,
         "video": video_best,
         "audio": audio_best,
     }
+
     Trace.result(f"{result}")
     return result

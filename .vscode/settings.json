@@ -130,6 +130,7 @@
       {
         "scope": [
          "entity.name.function.python",
+         "meta.attribute.python",
          "meta.function-call.generic.python",
          ],
         "settings": {

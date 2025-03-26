@@ -1,6 +1,6 @@
 [project]
 name = "youtube-download-helper"
-version = "0.1.2"
+version = "0.1.3"
 description = "..."
 authors = [
     { name = "Jürgen Schoenemeyer", email = "js007@web.de" },

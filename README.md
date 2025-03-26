@@ -3,12 +3,10 @@
 #### CLI commands
 
 ``` bash
-python src/main.py
-python src/main.py -id <youtube id>
-python src/main.py -id <youtube id> -a
-
 uv run src/main.py
 uv run src/main.py -id <youtube id>
+
+uv run src/main.py -a
 uv run src/main.py -id <youtube id> -a
 ```
 
@@ -16,7 +14,6 @@ uv run src/main.py -id <youtube id> -a
 
 ``` bash
 -id, --youtube_id -> Youtube ID (11 characters)
--l, --language    -> audio language (default="de")
 -a, --audio       -> only audio track
 -d, --debug       -> show web traffic
 ```
@@ -24,8 +21,10 @@ uv run src/main.py -id <youtube id> -a
 #### download
 
 ``` bash
- -> ./result/video/<channel>/<title>.webm
- -> ./result/audio/<channel>/<title>.m4a
+ -> ./result/video/<channel>/<title> (<video-id>+<audio-id>).mkv
+ -> ./result/video/<channel>/<title> (<video-id>+<audio-id>).mp4
+ -> ./result/audio/<channel>/<title> (<audio-id>).m4a
+ -> ./result/audio/<channel>/<title> (<audio-id>).webm
 ```
 
 #### dependencies

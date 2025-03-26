@@ -1,10 +1,10 @@
 """
-    © Jürgen Schoenemeyer, 17.03.2025 20:33
+    © Jürgen Schoenemeyer, 26.03.2025 20:10
 
     src/helper/youtube.py
 
     PUBLIC:
-     - download_video(video_id: str, path: Path | str, language: str, only_audio: bool, debug: bool = False) -> bool
+     - download_video(video_id: str, path: Path | str, only_audio: bool, debug: bool = False) -> bool
 
     PRIVATE:
      - valid_filename_utf16( text: str ) -> str
@@ -26,7 +26,7 @@ from utils.trace import Color, Trace
 
 # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/YoutubeDL.py#L128-L278
 
-def download_video(video_id: str, path: Path | str, language: str, only_audio: bool, debug: bool = False) -> bool:
+def download_video(video_id: str, path: Path | str, only_audio: bool, debug: bool = False) -> bool:
     path = Path(path)
 
     yt_opts: Dict[str, Any] = {
@@ -61,19 +61,24 @@ def download_video(video_id: str, path: Path | str, language: str, only_audio: b
         data_info = ydl.sanitize_info(info)
         export_json( path / channel, title + ".json", data_info, timestamp = timestamp ) # type: ignore[reportArgumentType] # -> ydl.sanitize_info(info)
 
-        available_tracks = analyse_data( info, title, language )
+        available_tracks = analyse_data( info, title )
+        # video: 'vp9', 'avc1', 'av01'
+        # audio: 'opus', 'mp4a'
+
         if only_audio:
-            audio = available_tracks["audio"]["mp4a"]
+            audio = available_tracks["audio"]["mp4a"][0]
+            # audio = available_tracks["audio"]["opus"][0]
             format = f"{audio}"
         else:
-            video = available_tracks["video"]["vp09"]
-            audio = available_tracks["audio"]["opus"]
+            video = available_tracks["video"]["vp9"][0]
+            if available_tracks["video"]["vp9"][1] < available_tracks["video"]["avc1"][1]:
+                video = available_tracks["video"]["avc1"][0]
+                Trace.info( "switch from 'vp9' to 'avc1'" )
 
-            # video = available_tracks["video"]["avc1"]
-            # audio = available_tracks["audio"]["opus"]
-
-            # video = available_tracks["video"]["av01"]
-            # audio = available_tracks["audio"]["mp4a"]
+            if "opus" in available_tracks["audio"]:
+                audio = available_tracks["audio"]["opus"][0]
+            else:
+                audio = available_tracks["audio"]["mp4a"][0]
 
             format = f"{video}+{audio}"
 
