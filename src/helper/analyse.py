@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 26.03.2025 19:56
+    © Jürgen Schoenemeyer, 26.03.2025 20:52
 
     src/helper/analyse.py
 
@@ -68,18 +68,15 @@ def analyse_data(data: Dict[str, Any], name: str = "") -> Dict[str, Any]:
 
     formats = data["formats"]
 
-    # pass 1: check for 'pref'
+    # pass 1: get max. 'language_preference' == original language (?)
 
-    use_language_pref = False
+    max_language_pref = -1
     for format in formats:
         protokoll = format["protocol"]
         if protokoll != "https":
             continue
 
-        lang_pref = format.get("language_preference", -1)
-        if lang_pref>0:
-            use_language_pref = True
-            break
+        max_language_pref = max(max_language_pref, format.get("language_preference", -1))
 
     # pass 2: find the highest data rate for each codec
 
@@ -105,7 +102,7 @@ def analyse_data(data: Dict[str, Any], name: str = "") -> Dict[str, Any]:
 
         if acodec != "none":
             lang_pref = format.get("language_preference", -1)
-            if use_language_pref and lang_pref<0:
+            if max_language_pref > lang_pref:
                 continue
 
             type = acodec.split(".")[0]
