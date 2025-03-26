@@ -21,10 +21,10 @@ uv run src/main.py -id <youtube id> -a
 #### download
 
 ``` bash
- -> ./result/video/<channel>/<title> (<video-id>+<audio-id>).mkv
- -> ./result/video/<channel>/<title> (<video-id>+<audio-id>).mp4
- -> ./result/audio/<channel>/<title> (<audio-id>).m4a
- -> ./result/audio/<channel>/<title> (<audio-id>).webm
+ -> ./data/video/<channel>/<title> (<video-id>+<audio-id>).mkv
+ -> ./data/video/<channel>/<title> (<video-id>+<audio-id>).mp4
+ -> ./data/audio/<channel>/<title> (<audio-id>).m4a
+ -> ./data/audio/<channel>/<title> (<audio-id>).webm
 ```
 
 #### dependencies
