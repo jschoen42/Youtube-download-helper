@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 27.03.2025 11:20
+    © Jürgen Schoenemeyer, 27.03.2025 17:55
 
     src/helper/analyse.py
 
@@ -37,7 +37,6 @@
 """
 from __future__ import annotations
 
-from collections import defaultdict
 from typing import TYPE_CHECKING, Any, Dict
 
 from utils.file import import_json, listdir_match_extention
@@ -72,8 +71,8 @@ def analyse_data(data: Dict[str, Any], name: str = "", fource_language: str = ""
     #   "language": "de-DE",
     #   "format_note": "German (Germany) original, low",
 
-    audios: Dict[str, Any] = defaultdict(lambda: defaultdict(dict)) # mp4a, opus, ac-3, ec-3 (per language)
-    videos: Dict[str, Any] = defaultdict(dict)                      # avc1, vp09, av01
+    videos: Dict[str, Any] = {}            # avc1, vp09, av01
+    audios: Dict[str, Dict[str, Any]] = {} # mp4a, opus, ac-3, ec-3 (per language)
 
     original_language = None
 
@@ -143,6 +142,12 @@ def analyse_data(data: Dict[str, Any], name: str = "", fource_language: str = ""
             if "original" in note:
                 original_language = lang
 
+            if lang not in audios:
+                audios[lang] = {}
+
+            if type not in audios[lang]:
+                audios[lang][type] = {}
+
             audios[lang][type][id] = {
                 "codec":    acodec,
                 "pref":     lang_pref,
@@ -157,6 +162,9 @@ def analyse_data(data: Dict[str, Any], name: str = "", fource_language: str = ""
 
         if vcodec != "none":
             type = vcodec.split(".")[0]
+
+            if type not in videos:
+                videos[type] = {}
 
             videos[type][id] = {
                 "codec":    vcodec,
