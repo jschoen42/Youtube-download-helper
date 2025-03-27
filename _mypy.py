@@ -415,7 +415,7 @@ def check_types(src_path: Path, python_version: str) -> None:
 
     text += "\n" + footer + "\n"
 
-    result_filename = f"mypy-{python_version}-'{name}'.txt"
+    result_filename = f"mypy-{python_version}-[{name}].txt"
     with (folder_path / result_filename).open(mode="w", newline="\n") as f:
         f.write(text)
 
