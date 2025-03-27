@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 27.03.2025 17:55
+    © Jürgen Schoenemeyer, 27.03.2025 18:45
 
     src/helper/analyse.py
 
@@ -61,15 +61,8 @@ def analyse_json(path: Path, filename: str, language: str) -> None:
 
 def analyse_data(data: Dict[str, Any], name: str = "", fource_language: str = "") -> Dict[str, Any]:
 
-    Trace.error( f"force language '{fource_language}'" )
-
-    # pass 1 - find all I
-
-    #   "language": "en-US",
-    #   "format_note": "American English - original (default)",
-
-    #   "language": "de-DE",
-    #   "format_note": "German (Germany) original, low",
+    if fource_language != "":
+        Trace.info( f"force language '{fource_language}'" )
 
     videos: Dict[str, Any] = {}            # avc1, vp09, av01
     audios: Dict[str, Dict[str, Any]] = {} # mp4a, opus, ac-3, ec-3 (per language)

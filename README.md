@@ -15,6 +15,7 @@ uv run src/main.py -id <youtube id> -a
 ``` bash
 -id, --youtube_id -> Youtube ID (11 characters)
 -a, --audio       -> only audio track
+-l, --language    -> force language
 -d, --debug       -> show web traffic
 ```
 

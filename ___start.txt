@@ -10,6 +10,12 @@ uv run src/main.py -id zqgbJq3T8Qo -a
 
 test
  - uv run src/analyse.py
+ - uv run src/analyse.py -l de
+ - uv run src/analyse.py -l en
+
+ - uv run src/analyse.py > test/data/_result.log
+ - uv run src/analyse.py -l de > test/data/_result-de.log
+ - uv run src/analyse.py -l en > test/data/_result-en.log
 
 uv run _pyright.py src
 uv run _mypy.py src
