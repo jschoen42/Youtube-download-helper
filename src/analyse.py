@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 26.03.2025 19:45
+    © Jürgen Schoenemeyer, 27.03.2025 11:24
 
     src/utils/analyse.py
 
@@ -14,12 +14,12 @@ from helper.analyse import analyse_json_all
 from utils.globals import BASE_PATH
 from utils.trace import Trace
 
-DIR_JSON = BASE_PATH / "_json"
+TEST_DIR = BASE_PATH / "data" / "test"
 
 def main() -> None:
     Trace.set(show_caller=False, show_timestamp=False)
 
-    analyse_json_all( DIR_JSON )
+    analyse_json_all( TEST_DIR )
 
 if __name__ == "__main__":
     Trace.set(debug_mode=True, timezone=False)

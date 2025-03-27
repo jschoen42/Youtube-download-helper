@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 26.03.2025 20:52
+    © Jürgen Schoenemeyer, 27.03.2025 09:41
 
     src/helper/analyse.py
 
@@ -9,16 +9,31 @@
 
     - analyse_data( data: Dict[str, Any], name: str = "") -> Dict[str, Any]
         {
-            'language': 'en',
+            'language': 'de',
             'video': {
-                'vp09': ['614', 8],
-                'avc1': ['270', 8],
+                'vp09': ['303', 9],
+                'avc1': ['299', 9],
+                'av01': ['399', 9],
             },
             'audio': {
                 'opus': ['251-5', 3],
                 'mp4a': ['140-5', 3],
             }
         }
+
+    quality video:
+     -  0:  256x144
+     -  5:  426x240
+     -  6:  640x360
+     -  7:  854x480
+     -  8: 1280x720
+     -  9: 1920x1080
+     - 10: 2560x1440
+     - 11: 3840x2160
+
+    quality audio:
+     - 2: ~  64 kbit/sec
+     - 3: ~ 128 kbit/sec
 """
 from __future__ import annotations
 
