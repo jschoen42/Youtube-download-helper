@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 26.03.2025 19:47
+    © Jürgen Schoenemeyer, 27.03.2025 11:20
 
     src/utils/main.py
 
@@ -35,14 +35,15 @@ def validate_id(_ctx: click.Context, _param: click.Parameter, value: str) -> str
 @click.command()
 @click.option("-id", "--youtube_id", callback=validate_id, prompt="Youtube ID (11 char)", help="Youtube ID - 11 characters")
 @click.option("-a",  "--audio", is_flag=True, help="only audio track")
+@click.option("-l",  "--language", help="force audio language 'de', 'en', 'null'", default="")
 @click.option("-d",  "--debug", is_flag=True, help="debug: show web traffic")
 
-def main(youtube_id: str, audio: bool, debug: bool) -> None:
+def main(youtube_id: str, audio: bool, language: str, debug: bool) -> None:
 
     if audio:
-        _ret = download_video(youtube_id, DEST_AUDIO, True, debug)
+        _ret = download_video(youtube_id, DEST_AUDIO, True, language, debug)
     else:
-        _ret = download_video(youtube_id, DEST_VIDEO, False, debug)
+        _ret = download_video(youtube_id, DEST_VIDEO, False, language, debug)
 
 if __name__ == "__main__":
     Trace.set(debug_mode=True, show_caller=False, timezone=False)

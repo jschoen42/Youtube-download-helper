@@ -15,11 +15,12 @@ from utils.globals import BASE_PATH
 from utils.trace import Trace
 
 TEST_DIR = BASE_PATH / "data" / "test"
+LANGUAGE = "de"
 
 def main() -> None:
-    Trace.set(show_caller=False, show_timestamp=False)
+    Trace.set(show_caller=True, show_timestamp=False)
 
-    analyse_json_all( TEST_DIR )
+    analyse_json_all( TEST_DIR, language = LANGUAGE )
 
 if __name__ == "__main__":
     Trace.set(debug_mode=True, timezone=False)

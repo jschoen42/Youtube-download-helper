@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 27.03.2025 09:41
+    © Jürgen Schoenemeyer, 27.03.2025 11:20
 
     src/helper/analyse.py
 
@@ -37,6 +37,7 @@
 """
 from __future__ import annotations
 
+from collections import defaultdict
 from typing import TYPE_CHECKING, Any, Dict
 
 from utils.file import import_json, listdir_match_extention
@@ -47,19 +48,21 @@ if TYPE_CHECKING:
 
 # yt-dlp https://www.youtube.com/watch?v=37SpumiGHgE --list-formats
 
-def analyse_json_all(path: Path) -> None:
+def analyse_json_all(path: Path, language: str) -> None:
     files, _ = listdir_match_extention( path, ["json"] )
     for file in files:
-        analyse_json( path, file )
+        analyse_json( path, file, language )
 
-def analyse_json(path: Path, filename: str) -> None:
+def analyse_json(path: Path, filename: str, language: str) -> None:
     data = import_json( path, filename )
     if data is None:
         return
 
-    _result = analyse_data( data, filename )
+    _result = analyse_data( data, filename, language )
 
-def analyse_data(data: Dict[str, Any], name: str = "") -> Dict[str, Any]:
+def analyse_data(data: Dict[str, Any], name: str = "", fource_language: str = "") -> Dict[str, Any]:
+
+    Trace.error( f"force language '{fource_language}'" )
 
     # pass 1 - find all I
 
@@ -69,8 +72,8 @@ def analyse_data(data: Dict[str, Any], name: str = "") -> Dict[str, Any]:
     #   "language": "de-DE",
     #   "format_note": "German (Germany) original, low",
 
-    audios: Dict[str, Any] = {} # mp4a, opus, ac-3, ec-3
-    videos: Dict[str, Any] = {} # avc1, vp09, av01
+    audios: Dict[str, Any] = defaultdict(lambda: defaultdict(dict)) # mp4a, opus, ac-3, ec-3 (per language)
+    videos: Dict[str, Any] = defaultdict(dict)                      # avc1, vp09, av01
 
     original_language = None
 
@@ -95,6 +98,7 @@ def analyse_data(data: Dict[str, Any], name: str = "") -> Dict[str, Any]:
 
     # pass 2: find the highest data rate for each codec
 
+    languages_skipped = set()
     for format in formats:
         protokoll = format["protocol"]
         if protokoll in {"mhtml", "m3u8_native"}:
@@ -116,27 +120,28 @@ def analyse_data(data: Dict[str, Any], name: str = "") -> Dict[str, Any]:
         # Audio
 
         if acodec != "none":
-            lang_pref = format.get("language_preference", -1)
-            if max_language_pref > lang_pref:
-                continue
-
             type = acodec.split(".")[0]
             if format.get("language"):
                 lang = format["language"].split("-")[0]
             else:
-                lang = "unknown"
+                lang = "null"
+
+            lang_pref = format.get("language_preference", -1)
+
+            if fource_language != "":
+                if lang != fource_language:
+                    languages_skipped.add(lang)
+                    continue
+
+            elif max_language_pref > lang_pref:
+                languages_skipped.add(lang)
+                continue
 
             note = format.get("format_note", "" )  # "English (United States) original (default), medium",
             if "DRC" in note:
                 continue
             if "original" in note:
                 original_language = lang
-
-            if lang not in audios:
-                audios[lang] = {}
-
-            if type not in audios[lang]:
-                audios[lang][type] = {}
 
             audios[lang][type][id] = {
                 "codec":    acodec,
@@ -152,8 +157,6 @@ def analyse_data(data: Dict[str, Any], name: str = "") -> Dict[str, Any]:
 
         if vcodec != "none":
             type = vcodec.split(".")[0]
-            if type not in videos:
-                videos[type] = {}
 
             videos[type][id] = {
                 "codec":    vcodec,
@@ -191,7 +194,7 @@ def analyse_data(data: Dict[str, Any], name: str = "") -> Dict[str, Any]:
             for type, types in value.items():
                 Trace.debug( f"id: {type:3} - quality: {types['quality']:2} - tbr: {types['tbr']:4} - codec: {types['codec']} - pref: {types['pref']}")
 
-    language = ""
+    language = fource_language
     if len( audios ) == 1:
         language = next(iter(audios.keys()))
     elif original_language:
@@ -201,7 +204,7 @@ def analyse_data(data: Dict[str, Any], name: str = "") -> Dict[str, Any]:
 
     audio_best = {}
     if language not in audios:
-        Trace.error( f"language '{language}' not found" )
+        Trace.error( f"language '{language}' empty" )
     else:
         for type, value in audios[language].items(): # -> last entry
             last    = list(value)[-1]
@@ -212,6 +215,7 @@ def analyse_data(data: Dict[str, Any], name: str = "") -> Dict[str, Any]:
         "language": language,
         "video": video_best,
         "audio": audio_best,
+        "languages_skipped": list(languages_skipped),
     }
 
     Trace.result(f"{result}")

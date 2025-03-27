@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 26.03.2025 20:10
+    © Jürgen Schoenemeyer, 27.03.2025 17:02
 
     src/helper/youtube.py
 
@@ -26,7 +26,7 @@ from utils.trace import Color, Trace
 
 # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/YoutubeDL.py#L128-L278
 
-def download_video(video_id: str, path: Path | str, only_audio: bool, debug: bool = False) -> bool:
+def download_video(video_id: str, path: Path | str, only_audio: bool, force_language: str = "", debug: bool = False) -> bool:
     path = Path(path)
 
     yt_opts: Dict[str, Any] = {
@@ -61,7 +61,14 @@ def download_video(video_id: str, path: Path | str, only_audio: bool, debug: boo
         data_info = ydl.sanitize_info(info)
         export_json( path / channel, title + ".json", data_info, timestamp = timestamp ) # type: ignore[reportArgumentType] # -> ydl.sanitize_info(info)
 
-        available_tracks = analyse_data( info, title )
+        available_tracks = analyse_data( info, title, force_language )
+        skipped = available_tracks["languages_skipped"]
+        if len(skipped)>0:
+            Trace.info(f"languages sikked '{skipped}'")
+
+        if len(available_tracks["audio"]) == 0:
+            Trace.fatal(f"no audio '{force_language}' available")
+
         # video: 'vp9', 'avc1', 'av01'
         # audio: 'opus', 'mp4a'
 
