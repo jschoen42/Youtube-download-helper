@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 26.03.2025 13:55
+    © Jürgen Schoenemeyer, 30.03.2025 15:54
 
     _basedpyright.py
 
@@ -154,25 +154,30 @@ def check_types(src_path: Path, python_version: str) -> None:
             encoding="utf-8",
             errors="replace",
         )
-    except subprocess.CalledProcessError as err:
-        print(f"BasedPyRight error: {err}")
+
+    except subprocess.CalledProcessError as e:
+        print(f"BasedPyRight error: {e}")
         sys.exit(1)
+
     finally:
         config.unlink()
 
-    # exit codes
-    #  - 0 No errors reported
-    #  - 1 One or more errors reported
-    #  - 2 Fatal error occurred with no errors or warnings reported
-    #  - 3 Config file could not be read or parsed
-    #  - 4 Illegal command-line parameters specified
+    # returncode:
+    #   0: No errors reported
+    #   1: One or more errors reported
+    #   2: Fatal error occurred with no errors or warnings reported
+    #   3: Config file could not be read or parsed
+    #   4: Illegal command-line parameters specified
 
-    if result.stderr != "":
-        print(f"exit code: {result.returncode} - {result.stderr.strip()}")
-        sys.exit(result.returncode)
+    returncode = result.returncode
+    stdout = result.stdout
+    stderr = result.stderr
 
-    stdout = result.stdout.replace("\xa0", " ") # non breaking space
-    data = json.loads(stdout)
+    if stderr != "":
+        print(f"exit code: {returncode} - {stderr}")
+        sys.exit(returncode)
+
+    data = json.loads(stdout.replace("\xa0", " ")) # non breaking space
 
     # {
     #   "version": "1.1.394",
@@ -270,7 +275,7 @@ def check_types(src_path: Path, python_version: str) -> None:
 
     duration = time.perf_counter() - start
     print(f"[BasedPyRight {version} ({duration:.2f} sec)] {footer} -> {RESULT_FOLDER}/{result_filename}")
-    sys.exit(result.returncode)
+    sys.exit(returncode)
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="static type check with BasedPyRight")

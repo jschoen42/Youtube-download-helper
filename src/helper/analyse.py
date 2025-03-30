@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 27.03.2025 18:45
+    © Jürgen Schoenemeyer, 30.03.2025 21:35
 
     src/helper/analyse.py
 
@@ -114,14 +114,14 @@ def analyse_data(data: Dict[str, Any], name: str = "", fource_language: str = ""
         if acodec != "none":
             type = acodec.split(".")[0]
             if format.get("language"):
-                lang = format["language"].split("-")[0]
+                lang = format["language"]
             else:
                 lang = "null"
 
             lang_pref = format.get("language_preference", -1)
 
             if fource_language != "":
-                if lang != fource_language:
+                if lang.split("-")[0] != fource_language:
                     languages_skipped.add(lang)
                     continue
 

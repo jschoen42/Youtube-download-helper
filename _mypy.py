@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 26.03.2025 13:55
+    © Jürgen Schoenemeyer, 31.03.2025 23:52
 
     _mypy.py
 
@@ -36,6 +36,7 @@ import re
 import shutil
 import subprocess
 import sys
+import threading
 import time
 
 from argparse import ArgumentParser
@@ -43,7 +44,6 @@ from collections import Counter
 from datetime import datetime
 from pathlib import Path
 from re import Match
-from subprocess import CompletedProcess
 from typing import List
 
 BASE_PATH = Path(sys.argv[0]).parent.parent.resolve()
@@ -223,7 +223,7 @@ def check_types(src_path: Path, python_version: str) -> None:
 
     start = time.perf_counter()
 
-    name = src_path.stem
+    name = src_path.name
     if name == "":
         name = "."
 
@@ -250,38 +250,59 @@ def check_types(src_path: Path, python_version: str) -> None:
     try:
         mypy_path = shutil.which("mypy")
         if mypy_path is None:
-            print("Error: 'mypy' not installed -> uv add mypy --dev")
+            print("Error: 'MyPy' not installed -> uv add mypy --dev")
             sys.exit(1)
+
+        def show_scanning(idle_event: threading.Event) -> None:
+            counter = 0
+            while not idle_event.is_set():
+                print(f"MyPy is scanning ... ({counter} sec)", end="\r", flush=True)
+                counter += 1
+                idle_event.wait(1)
+
+        idle_event = threading.Event()
+        idle_thread = threading.Thread(target=show_scanning, args=(idle_event,))
+        idle_thread.start()
 
         # https://mypy.readthedocs.io/en/stable/command_line.html
 
-        result: CompletedProcess[str] = subprocess.run(
+        result = subprocess.run(
             [mypy_path, str(src_path), "--sqlite-cache", "--config-file", CONFIG_FILE, *settings, "--verbose", "--output=json"],
             capture_output=True,
             text=True,
-            check=False, # important
+            check=False,
             encoding="utf-8",
             errors="replace",
         )
-    except subprocess.CalledProcessError as err:
-        print(f"mypy error: {err}")
+
+    except subprocess.CalledProcessError as e:
+        print(f"mypy error: {e}")
         sys.exit(1)
+
     finally:
+        idle_event.set()
+        idle_thread.join()
         config.unlink()
 
-    # analyse stderr ("--verbose")
+    # returncode:
+    #   0: if no type errors
+    #   1: if there are some type errors
+    #   2: in case of a crash, bad arguments, and other non-standard conditions
 
-    # LOG:  Mypy Version: 1.14.0
-    # LOG:  Found source: BuildSource(path='src\\__init__.py', module='__main__', has_text=False,
-    #                     base_dir='G:\\Python\\Whisper\\whisper-datev-gitlab\\src', followed=False)
-    # ...
-    # LOG:  Metadata fresh for __main__: file src\__init__.py
-
+    returncode = result.returncode
+    stdout = result.stdout
     stderr = result.stderr
 
     sources: List[str] = []
     version = ""
     for line in stderr.splitlines():
+
+        # LOG:  Mypy Version: 1.15.0
+        # LOG:  Found source: BuildSource(path='src\\__init__.py', module='__main__', has_text=False,
+        #                     base_dir='G:\\Python\\Whisper\\whisper-datev-gitlab\\src', followed=False)
+        # ...
+        # LOG:  Metadata fresh for __main__: file src\__init__.py
+
         if "Mypy Version:" in line:
             version = line.split("Mypy Version:")[-1].strip()
             text = text.replace("[version]", version)
@@ -346,7 +367,7 @@ def check_types(src_path: Path, python_version: str) -> None:
 
     fatal_error = False
     footer = ""
-    for line in result.stdout.splitlines():
+    for line in stdout.splitlines():
         if line == "":
             continue
 
@@ -421,7 +442,7 @@ def check_types(src_path: Path, python_version: str) -> None:
 
     duration = time.perf_counter() - start
     print(f"[MyPy {version} ({duration:.2f} sec)] {footer} -> {RESULT_FOLDER}/{result_filename}")
-    sys.exit(result.returncode)
+    sys.exit(returncode)
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="static type check with mypy")

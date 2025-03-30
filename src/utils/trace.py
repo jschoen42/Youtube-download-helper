@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 22.03.2025 10:40
+    © Jürgen Schoenemeyer, 03.04.2025 20:50
 
     src/utils/trace.py
 
@@ -164,14 +164,14 @@ class Trace:
 
                     if importlib.util.find_spec("tzdata") is None:
                         cls.settings["timezone"] = True
-                        Trace.warning( f"please install 'tzdata' for named timezones e.g. '{value}' -> uv add tzdata" )
+                        Trace.warning(f"please install 'tzdata' for named timezones e.g. '{value}' -> uv add tzdata")
 
                     else:
                         try:
                             _ = ZoneInfo(value)
                         except ZoneInfoNotFoundError:
                             cls.settings["timezone"] = True
-                            Trace.error( f"tzdata '{value}' unknown timezone" )
+                            Trace.error(f"tzdata '{value}' unknown timezone")
 
             else:
                 Trace.fatal(f"trace settings: unknown parameter '{key}'")
@@ -271,11 +271,11 @@ class Trace:
                         tty.setraw(sys.stdin.fileno())         # type: ignore[attr-defined] # -> Windows
                         key = sys.stdin.buffer.read(1)
                     finally:
-                        termios.tcsetattr(                     # type: ignore[attr-defined] # -> Windows
+                        termios.tcsetattr(                    # type: ignore[attr-defined] # -> Windows
                             fd,
                             termios.TCSADRAIN,                 # type: ignore[attr-defined] # -> Windows
                             old_settings,
-                        )
+                       )
                         print()  # noqa: T201
 
                 if key == b"\x1b":
@@ -320,8 +320,8 @@ class Trace:
             with file_path.open(mode="w", encoding="utf-8", newline="\n") as file:
                 file.write(text)
 
-        except OSError as err:
-            Trace.error(f"[trace_end] write {err}")
+        except OSError as e:
+            Trace.error(f"write {e}")
 
         cls.messages = []
 

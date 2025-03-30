@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 27.03.2025 17:02
+    © Jürgen Schoenemeyer, 30.03.2025 21:47
 
     src/helper/youtube.py
 
@@ -64,23 +64,36 @@ def download_video(video_id: str, path: Path | str, only_audio: bool, force_lang
         available_tracks = analyse_data( info, title, force_language )
         skipped = available_tracks["languages_skipped"]
         if len(skipped)>0:
-            Trace.info(f"languages sikked '{skipped}'")
+            Trace.info(f"languages skipped '{skipped}'")
 
         if len(available_tracks["audio"]) == 0:
             Trace.fatal(f"no audio '{force_language}' available")
 
-        # video: 'vp9', 'avc1', 'av01'
-        # audio: 'opus', 'mp4a'
+        # audio: mp4a, opus
+        # video: av01 (H.265), vp9, avc1 (H.264)
 
         if only_audio:
-            audio = available_tracks["audio"]["mp4a"][0]
-            # audio = available_tracks["audio"]["opus"][0]
+
+            # mp4a [.m4a] -> opus [.webm]
+
+            if "mp4a" in available_tracks["audio"]:
+                audio = available_tracks["audio"]["mp4a"][0]
+            else:
+                audio = available_tracks["audio"]["opus"][0]
+
             format = f"{audio}"
         else:
-            video = available_tracks["video"]["vp9"][0]
-            if available_tracks["video"]["vp9"][1] < available_tracks["video"]["avc1"][1]:
-                video = available_tracks["video"]["avc1"][0]
-                Trace.info( "switch from 'vp9' to 'avc1'" )
+
+            # av01 [.webm] -> vp9 [.webm] -> avc1 [.mp4]
+            # opus -> mp4a
+
+            if "av01" in available_tracks["video"]:
+                video = available_tracks["video"]["av01"][0]
+            else:
+                video = available_tracks["video"]["vp9"][0]
+                if available_tracks["video"]["vp9"][1] < available_tracks["video"]["avc1"][1]: # quality
+                    video = available_tracks["video"]["avc1"][0]
+                    Trace.info( "switch from 'vp9' to 'avc1'" )
 
             if "opus" in available_tracks["audio"]:
                 audio = available_tracks["audio"]["opus"][0]
