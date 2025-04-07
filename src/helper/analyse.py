@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 30.03.2025 21:35
+    © Jürgen Schoenemeyer, 07.04.2025 20:00
 
     src/helper/analyse.py
 
@@ -20,6 +20,17 @@
                 'mp4a': ['140-5', 3],
             }
         }
+
+    video:
+     - vp09 [248], [625]
+     - avc1 [137]
+     - av01 [399], [401]
+
+    audio:
+     - opus [251]
+     - mp4a [140]
+     - ac-3 [380]
+     - ec-3 [328]
 
     quality video:
      -  0:  256x144

@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 30.03.2025 21:47
+    © Jürgen Schoenemeyer, 07.04.2025 20:00
 
     src/helper/youtube.py
 
@@ -69,13 +69,15 @@ def download_video(video_id: str, path: Path | str, only_audio: bool, force_lang
         if len(available_tracks["audio"]) == 0:
             Trace.fatal(f"no audio '{force_language}' available")
 
-        # audio: mp4a, opus
+        # audio: mp4a, opus, ac-3, ec-3 (Enhanced AC-3)
         # video: av01 (H.265), vp9, avc1 (H.264)
 
         if only_audio:
 
             # mp4a [.m4a] -> opus [.webm]
 
+            # if "ac-3" in available_tracks["audio"]:
+            #     audio = available_tracks["audio"]["ac-3"][0]
             if "mp4a" in available_tracks["audio"]:
                 audio = available_tracks["audio"]["mp4a"][0]
             else:
