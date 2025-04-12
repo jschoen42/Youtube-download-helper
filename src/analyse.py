@@ -1,9 +1,8 @@
 """
-    © Jürgen Schoenemeyer, 27.03.2025 18:53
+    © Jürgen Schoenemeyer, 12.04.2025 18:38
 
     src/utils/analyse.py
 
-    .venv/Scripts/activate
     uv run src/analyse.py
     uv run src/analyse.py -l de
 

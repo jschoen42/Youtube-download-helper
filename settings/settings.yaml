@@ -1,0 +1,20 @@
+%YAML 1.1
+---
+
+format:
+  normal:
+    audio_codecs:
+    - opus
+    - mp4a
+
+    video_codecs:
+    - av01
+    - vp9
+    - avc1
+
+  audio_only:
+    audio_codecs:
+    - ec-3
+    - ac-3
+    - mp4a
+    - opus

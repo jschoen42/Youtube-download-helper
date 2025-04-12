@@ -1,16 +1,11 @@
 """
-    © Jürgen Schoenemeyer, 27.03.2025 11:20
+    © Jürgen Schoenemeyer, 12.04.2025 18:38
 
-    src/utils/main.py
-
-    .venv/Scripts/activate
-
-    python src/main.py
-    python src/main.py -id rU5mxh5tsI0
-    python src/main.py -a -id zqgbJq3T8Qo
+    src/main.py
 
     uv run src/main.py
     uv run src/main.py -id rU5mxh5tsI0
+    uv run src/main.py -l de -id zqgbJq3T8Qo
     uv run src/main.py -a zqgbJq3T8Qo
 """
 from __future__ import annotations
@@ -21,6 +16,7 @@ import click
 
 from helper.youtube import download_video
 from utils.globals import BASE_PATH
+from utils.prefs import Prefs
 from utils.trace import Trace
 
 DEST_VIDEO = BASE_PATH / "data" / "video"
@@ -49,9 +45,12 @@ if __name__ == "__main__":
     Trace.set(debug_mode=True, show_caller=False, timezone=False)
     Trace.action(f"Python version {sys.version}")
 
+    Prefs.init("settings")
+    Prefs.load("settings.yaml")
+
     try:
         main()
     except KeyboardInterrupt:
         print()
         Trace.exception("KeyboardInterrupt")
-        sys.exit(130)
+        sys.exit()

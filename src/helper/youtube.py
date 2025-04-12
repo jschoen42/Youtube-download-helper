@@ -1,10 +1,10 @@
 """
-    © Jürgen Schoenemeyer, 07.04.2025 20:00
+    © Jürgen Schoenemeyer, 12.04.2025 18:38
 
     src/helper/youtube.py
 
     PUBLIC:
-     - download_video(video_id: str, path: Path | str, only_audio: bool, debug: bool = False) -> bool
+     - download_video(youtube_id: str, path: Path | str, audio_only: bool, debug: bool = False) -> bool
 
     PRIVATE:
      - valid_filename_utf16( text: str ) -> str
@@ -22,12 +22,20 @@ from yt_dlp.utils import DownloadError  # type: ignore[import-untyped]
 
 from helper.analyse import analyse_data
 from utils.file import export_json
+from utils.prefs import Prefs
 from utils.trace import Color, Trace
 
 # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/YoutubeDL.py#L128-L278
 
-def download_video(video_id: str, path: Path | str, only_audio: bool, force_language: str = "", debug: bool = False) -> bool:
+def download_video(youtube_id: str, path: Path | str, audio_only: bool, force_language: str = "", debug: bool = False) -> bool:
     path = Path(path)
+
+    if audio_only:
+        audio_codecs = Prefs.get("format.audio_only.audio_codecs")
+        video_codecs = []
+    else:
+        audio_codecs = Prefs.get("format.normal.audio_codecs")
+        video_codecs = Prefs.get("format.normal.video_codecs")
 
     yt_opts: Dict[str, Any] = {
         "verbose": False,
@@ -42,13 +50,13 @@ def download_video(video_id: str, path: Path | str, only_audio: bool, force_lang
 
     try:
         title = ""
-        video_url = f"https://www.youtube.com/watch?v={video_id}"
+        video_url = f"https://www.youtube.com/watch?v={youtube_id}"
 
         # step 1: metadata: title, ...
 
         start_time = time.time()
         with yt_dlp.YoutubeDL(yt_opts) as ydl:
-            Trace.info(f"get title '{video_id}'")
+            Trace.info(f"get metadata '{youtube_id}'")
 
             info = ydl.extract_info(video_url, download=False)
             if info is None:
@@ -72,40 +80,39 @@ def download_video(video_id: str, path: Path | str, only_audio: bool, force_lang
         # audio: mp4a, opus, ac-3, ec-3 (Enhanced AC-3)
         # video: av01 (H.265), vp9, avc1 (H.264)
 
-        if only_audio:
+        audio_id = ""
+        video_id = ""
+        format = ""
 
-            # mp4a [.m4a] -> opus [.webm]
+        quality_max = 0
+        for audio_codec in audio_codecs:
+            if audio_codec in available_tracks["audio"]:
+                quality = available_tracks["audio"][audio_codec][1]
+                if quality > quality_max:
+                    audio_id = available_tracks["audio"][audio_codec][0]
+                    quality_max = quality
 
-            # if "ac-3" in available_tracks["audio"]:
-            #     audio = available_tracks["audio"]["ac-3"][0]
-            if "mp4a" in available_tracks["audio"]:
-                audio = available_tracks["audio"]["mp4a"][0]
-            else:
-                audio = available_tracks["audio"]["opus"][0]
+        if audio_id == "":
+            Trace.fatal(f"no audio codec matching {audio_codecs} <-> {available_tracks["audio"]}")
 
-            format = f"{audio}"
+        if audio_only:
+            format = f"{audio_id}"
         else:
+            quality_max = 0
+            for video_codec in video_codecs:
+                if video_codec in available_tracks["video"]:
+                    quality = available_tracks["video"][video_codec][1]
+                    if quality > quality_max:
+                        video_id = available_tracks["video"][video_codec][0]
+                        quality_max = quality
 
-            # av01 [.webm] -> vp9 [.webm] -> avc1 [.mp4]
-            # opus -> mp4a
-
-            if "av01" in available_tracks["video"]:
-                video = available_tracks["video"]["av01"][0]
+            if video_id == "":
+                Trace.fatal(f"no video codec matching {video_codecs} <-> {available_tracks["video"]}")
             else:
-                video = available_tracks["video"]["vp9"][0]
-                if available_tracks["video"]["vp9"][1] < available_tracks["video"]["avc1"][1]: # quality
-                    video = available_tracks["video"]["avc1"][0]
-                    Trace.info( "switch from 'vp9' to 'avc1'" )
-
-            if "opus" in available_tracks["audio"]:
-                audio = available_tracks["audio"]["opus"][0]
-            else:
-                audio = available_tracks["audio"]["mp4a"][0]
-
-            format = f"{video}+{audio}"
+                format = f"{video_id}+{audio_id}"
 
         yt_opts = {
-            "extract_audio": only_audio,
+            "extract_audio": audio_only,
             "verbose":       False,
             "quiet":         True,
             "force-ipv6":    True,
@@ -114,10 +121,6 @@ def download_video(video_id: str, path: Path | str, only_audio: bool, force_lang
 
             # "debug_printtraffic": True,
         }
-
-        # yt_opts["format"] = format
-        # yt_opts["verbose"] = True
-        # yt_opts["debug_printtraffic"] = True
 
         Trace.result( f"{time.time() - start_time:.2f} sec => '{title}' ({format})" )
 

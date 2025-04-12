@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 03.04.2025 20:50
+    © Jürgen Schoenemeyer, 07.04.2025 20:30
 
     src/utils/trace.py
 
@@ -257,7 +257,7 @@ class Trace:
                 if platform.system() == "Windows":
                     import msvcrt
 
-                    key = msvcrt.getch()                      # type: ignore[attr-defined] # -> Linux
+                    key = msvcrt.getch()                      # type: ignore[attr-defined, reportAttributeAccessIssue] # -> Linux
                     print()  # noqa: T201
 
                 else: # unix terminal
@@ -266,14 +266,14 @@ class Trace:
                     import tty
 
                     fd: int = sys.stdin.fileno()
-                    old_settings: Any = termios.tcgetattr(fd)  # type: ignore[attr-defined] # -> Windows
+                    old_settings: Any = termios.tcgetattr(fd)  # type: ignore[attr-defined, reportAttributeAccessIssue] # -> Windows
                     try:
-                        tty.setraw(sys.stdin.fileno())         # type: ignore[attr-defined] # -> Windows
+                        tty.setraw(sys.stdin.fileno())         # type: ignore[attr-defined, reportAttributeAccessIssue] # -> Windows
                         key = sys.stdin.buffer.read(1)
                     finally:
-                        termios.tcsetattr(                    # type: ignore[attr-defined] # -> Windows
+                        termios.tcsetattr(                     # type: ignore[attr-defined, reportAttributeAccessIssue] # -> Windows
                             fd,
-                            termios.TCSADRAIN,                 # type: ignore[attr-defined] # -> Windows
+                            termios.TCSADRAIN,                 # type: ignore[attr-defined, reportAttributeAccessIssue] # -> Windows
                             old_settings,
                        )
                         print()  # noqa: T201

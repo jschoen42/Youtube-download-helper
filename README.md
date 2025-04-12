@@ -19,6 +19,11 @@ uv run src/main.py -id <youtube id> -a
 -d, --debug       -> show web traffic
 ```
 
+#### codec priorities
+``` bash
+-> settings/settings.yaml
+```
+
 #### download
 
 ``` bash
