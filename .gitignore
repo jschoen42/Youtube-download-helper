@@ -23,6 +23,10 @@ _old/*
 /.windsurfrules
 /.timestamps.json
 
+### Javascript
+
+**/node_modules/**
+
 ### General
 .env
 *.7z

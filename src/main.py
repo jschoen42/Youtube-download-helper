@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 12.04.2025 18:38
+    © Jürgen Schoenemeyer, 24.05.2025 19:51
 
     src/main.py
 
@@ -23,6 +23,9 @@ DEST_VIDEO = BASE_PATH / "data" / "video"
 DEST_AUDIO = BASE_PATH / "data" / "audio"
 
 def validate_id(_ctx: click.Context, _param: click.Parameter, value: str) -> str:
+    if "?v=" in value:
+        value = value.split("?v=")[1][:11]
+
     if len(value) != 11:
         msg = f"length = {len(value)} (should be 11)"
         raise click.BadParameter(msg)
@@ -35,7 +38,6 @@ def validate_id(_ctx: click.Context, _param: click.Parameter, value: str) -> str
 @click.option("-d",  "--debug", is_flag=True, help="debug: show web traffic")
 
 def main(youtube_id: str, audio: bool, language: str, debug: bool) -> None:
-
     if audio:
         _ret = download_video(youtube_id, DEST_AUDIO, True, language, debug)
     else:

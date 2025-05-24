@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 03.04.2025 20:50
+    © Jürgen Schoenemeyer, 24.05.2025 19:14
 
     src/utils/file.py
 
@@ -47,6 +47,7 @@
      - get_file_infos(path: Path | str, filename: str, _in_type: str) -> None | Dict
     #
      - copy_my_file(source: str, dest: str, _show_updated: bool) -> bool
+     - sanitize_filename(filename: str) -> str:
 
     PRIVATE:
      - _increment_filename(filename_stem: str) -> str
@@ -246,6 +247,8 @@ def beautify_path(path: Path | str) -> str:
 # D:\Projekte_P4\Articulate-Storyline\WebService1\_workdir\jobs\c4c3dda9-0e58-49dd-86d0-151fe2267edb\tmp\media\image\resultslideVectorText.png -> media\image\resultslideVectorText.png
 #
 def get_trace_path(filepath: Path | str) -> str:
+    filepath = Path(filepath)
+
     tmp_path = os.path.normpath(filepath).replace("\\", "/")
 
     if "/_workdir/" in tmp_path:
@@ -583,3 +586,10 @@ def copy_my_file(source: Path | str, dest: Path | str, _show_updated: bool) -> b
             return False
 
     return True
+
+def sanitize_filename(filename: str) -> str:
+    forbidden_chars = r'[<>:"/\\|?*]'
+
+    sanitized_filename = re.sub(forbidden_chars, "-", filename)
+    sanitized_filename = sanitized_filename.strip().strip(".")
+    return sanitized_filename

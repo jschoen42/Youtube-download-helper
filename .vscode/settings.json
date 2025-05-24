@@ -19,11 +19,16 @@
   "editor.fontWeight": 400,
   "editor.formatOnSave": false,
   "editor.formatOnType": true,
-  "editor.indentSize": 2,
   "editor.inlineSuggest.enabled": true,
-  "editor.insertSpaces": true,
   "editor.lineHeight": 1.4,
+
+  "editor.detectIndentation": false,
   "editor.tabSize": 2,
+  "editor.indentSize": 2,
+  "editor.insertSpaces": true,
+
+  "css.lint.emptyRules": "ignore",
+  "css.lint.duplicateProperties": "warning",
 
   "[css]": {
   },
@@ -80,7 +85,7 @@
     "*test.py",
   ],
   "python.testing.pytestEnabled": true,
-  // "python.testing.unittestEnabled": false,
+  "_python.testing.unittestEnabled": false,
   "python.testing.cwd": "${workspaceFolder}/tests",
 
   "files.autoGuessEncoding": false,
@@ -140,6 +145,17 @@
           "entity.name.function.python",
           "meta.attribute.python",
           "meta.function-call.generic.python",
+        ],
+        "settings": {
+          "foreground": "#000000",
+          "fontStyle": "bold",
+        }
+      },
+      {
+        "scope": [
+          "variable.other.object.js",
+          "entity.name.function.js",
+          "support.variable.property.js",
         ],
         "settings": {
           "foreground": "#000000",

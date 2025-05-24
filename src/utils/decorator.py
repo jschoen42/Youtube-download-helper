@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 03.04.2025 20:50
+    © Jürgen Schoenemeyer, 24.05.2025 19:14
 
     src/utils/decorator.py
 
@@ -9,8 +9,8 @@
      - @retry_exception(text: str="", exception=Exception, delay: int|float=1, retries: int=5)
 
     PRIVATE:
-     - def get_args_values(func: Callable, *args: Any, **kwargs: Any) -> Tuple[List, Dict]:
-     - def replace_arguments(match: Match, func_name: str, *args: Any, **kwargs: Any) -> str:
+     - get_args_values(func: Callable, *args: Any, **kwargs: Any) -> Tuple[List, Dict]
+     - replace_arguments(match: Match, func_name: str, *args: Any, **kwargs: Any) -> str
 """
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ import re
 import time
 
 from inspect import BoundArguments, Signature
-from typing import TYPE_CHECKING, Any, Dict, Generator, List, Match, Tuple
+from typing import TYPE_CHECKING, Any, Dict, Generator, Match, Tuple
 
 from utils.trace import Color, Trace
 
@@ -94,10 +94,15 @@ def my_decorator(function=None, *, ...) -> Callable:
 # @duration("{__name__} 1: {0|name} {1|number} {2|type}", rounds=1)
 # @duration(text="{__name__} 0: {0} {1} {2}", rounds=1)
 
-def duration(special: Callable[[Any], Any] | str | None = None, *, text: str | None = None, rounds: int=1) -> Callable[[Any], Any]:
-    def decorator(func: Callable[[Any], Any]) -> Callable[[Any], Any]:
+def duration(special: Callable[..., Any] | str | None = None, *, text: str | None = None, rounds: int=1) -> Callable[..., Any]:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(wrapped=func)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
+        def wrapper(*args: Tuple[Any, ...], **kwargs: Dict[str, Any]) -> Any:
+
+            function_name = "unknown"
+            if hasattr(func, "__name__"):
+                function_name = str(func.__name__)
+
 
             # get all input args & kwargs of the decorated function
             args_values, kwargs_values = get_args_values(func, *args, **kwargs)
@@ -115,7 +120,7 @@ def duration(special: Callable[[Any], Any] | str | None = None, *, text: str | N
                 pretext = special
 
             elif text is None:           # text as kwarg
-                pretext = func.__name__
+                pretext = function_name
             else:
                 pretext = text
 
@@ -123,7 +128,7 @@ def duration(special: Callable[[Any], Any] | str | None = None, *, text: str | N
             # args_values: ['Max', 99, False], kwargs_values: {'name': 'Max', 'number': 99, 'type': False}
 
             def replace(match: Match[str]) -> str:
-                return replace_argument_values(match, func.__name__, args_values, kwargs_values)
+                return replace_argument_values(match, function_name, args_values, kwargs_values)
 
             pattern = r"\{(.*?)\}"
             pretext = re.sub(pattern, replace, pretext)
@@ -137,21 +142,29 @@ def duration(special: Callable[[Any], Any] | str | None = None, *, text: str | N
             return result
         return wrapper
 
-    if callable(special):
-        return decorator(special) # @duration
-    else:
-        return decorator          # @duration(...)
+    # if callable(special):
+    #     return decorator(func=special) # @deprecated
+    # else:
+    #     return decorator          # @deprecated(...
 
+    if isinstance(special, str) or special is None:
+        return decorator # @duration(...)
+
+    return decorator(func=special) # @duration
 
 # @deprecated
 # @deprecated()
 # @deprecated("licence does not fit")
 # @deprecated(message="licence does not fit")
 
-def deprecated(special: Callable[[Any], Any] | str | None = None, *, message: str | None = None) -> Callable[[Any], Any]:
-    def decorator(func: Callable[[Any], Any]) -> Callable[[Any], Any]:
+def deprecated(special: Callable[..., Any] | str | None = None, *, message: str | None = None) -> Callable[..., Any]:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(wrapped=func)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
+        def wrapper(*args: Tuple[Any, ...], **kwargs: Dict[str, Any]) -> Any:
+
+            function_name = "unknown"
+            if hasattr(func, "__name__"):
+                function_name = str(func.__name__)
 
             text = ""
             if isinstance(special, str): # message as arg
@@ -163,9 +176,9 @@ def deprecated(special: Callable[[Any], Any] | str | None = None, *, message: st
             # before ...
 
             if text == "":
-                Trace.decorator(f"{Color.RED}'{func.__name__}' is deprecated{Color.RESET}", path="deprecated")
+                Trace.decorator(f"{Color.RED}'{function_name}' is deprecated{Color.RESET}", path="deprecated")
             else:
-                Trace.decorator(f"{Color.RED}'{func.__name__}' is deprecated ({text}){Color.RESET}", path="deprecated")
+                Trace.decorator(f"{Color.RED}'{function_name}' is deprecated ({text}){Color.RESET}", path="deprecated")
 
             result = func(*args, **kwargs)
 
@@ -174,14 +187,19 @@ def deprecated(special: Callable[[Any], Any] | str | None = None, *, message: st
             return result
         return wrapper
 
-    if callable(special):
-        return decorator(func=special) # @deprecated
-    else:
-        return decorator          # @deprecated(...
+    # if callable(special):
+    #     return decorator(func=special) # @deprecated
+    # else:
+    #     return decorator          # @deprecated(...
+
+    if isinstance(special, str) or special is None:
+        return decorator # @duration(...)
+
+    return decorator(func=special) # @duration
 
 """
-def deprecated(message: str="") -> Callable:
-    def decorator(func: Callable) -> Callable:
+def deprecated(message: str="") -> Callable[..., Any]:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
 
@@ -206,19 +224,23 @@ def deprecated(message: str="") -> Callable:
 # @retry_exception("error limit '{0}'", exception=ValueError)
 # @retry_exception("ttx => font '{0}'", exception=ValueError, delay=2.5, retries=10)
 
-def retry_exception(text: str | None = None, exception: type[BaseException] = Exception, delay: float = 1, retries: int = 5) -> Callable[[Any], Any]:
-    def decorator(func: Callable[[Any], Any]) -> Callable[[Any], Any]:
+def retry_exception(text: str | None = None, exception: type[BaseException] = Exception, delay: float = 1, retries: int = 5) -> Callable[..., Any]:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
+        def wrapper(*args: Tuple[Any, ...], **kwargs: Dict[str, Any]) -> Any:
+
+            function_name = "unknown"
+            if hasattr(func, "__name__"):
+                function_name = str(func.__name__)
 
             # get all input args & kwargs of the decorated function
             args_values, kwargs_values = get_args_values(func, *args, **kwargs)
 
             if text is None:
-                pretext = func.__name__
+                pretext = function_name
             else:
                 def replace(match: Match[str]) -> str:
-                    return replace_argument_values(match, func.__name__, args_values, kwargs_values)
+                    return replace_argument_values(match, function_name, args_values, kwargs_values)
 
                 pattern = r"\{(.*?)\}"
                 pretext = re.sub(pattern, replace, text)
@@ -243,7 +265,7 @@ def retry_exception(text: str | None = None, exception: type[BaseException] = Ex
 
 # get args and kwargs values -> default values are considered
 
-def get_args_values(func: Callable[[Any], Any], *args: Any, **kwargs: Any) -> Tuple[List[Any], Dict[Any, Any]]:
+def get_args_values(func: Callable[..., Any], *args: Tuple[Any, ...], **kwargs: Dict[str, Any]) -> Tuple[Tuple[Any, ...], Dict[Any, Any]]:
     sig: Signature = inspect.signature(func)
     bound_args: BoundArguments = sig.bind_partial(*args, **kwargs)
     bound_args.apply_defaults()
@@ -254,12 +276,12 @@ def get_args_values(func: Callable[[Any], Any], *args: Any, **kwargs: Any) -> Tu
         args_values.append(value)
         kwargs_values[name] = value
 
-    return args_values, kwargs_values
+    return tuple(args_values), kwargs_values
 
 # @duration("{__name__} 1: {0|name} {1|number} {2|type}"
 # args_values: ['Max', 99, False], kwargs_values: {'name': 'Max', 'number': 99, 'type': False}
 
-def replace_argument_values(match: Match[str], func_name: str, args_values: List[Any], kwargs_values: Dict[Any, Any]) -> str:
+def replace_argument_values(match: Match[str], func_name: str, args_values: Tuple[Any, ...], kwargs_values: Dict[str, Any]) -> str:
     arguments = match.group(1)
 
     if arguments == "__name__":
@@ -285,10 +307,10 @@ def replace_argument_values(match: Match[str], func_name: str, args_values: List
 #  - not for kwargs !
 #  - not using the existing annotation !
 
-def type_check(*expected_types: type) -> Callable[[Any], Any]:
-    def decorator(func: Callable[[Any], Any]) -> Callable[[Any], Any]:
+def type_check(*expected_types: type) -> Callable[..., Any]:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(wrapped=func)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
+        def wrapper(*args: Tuple[Any, ...], **kwargs: Dict[str, Any]) -> Any:
             result = func(*args, **kwargs)
 
             for arg, expected_type in zip(args, expected_types, strict=False):

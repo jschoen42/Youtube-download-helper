@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 31.03.2025 23:52
+    © Jürgen Schoenemeyer, 11.05.2025 12:16
 
     _mypy.py
 
@@ -267,7 +267,8 @@ def check_types(src_path: Path, python_version: str) -> None:
         # https://mypy.readthedocs.io/en/stable/command_line.html
 
         result = subprocess.run(
-            [mypy_path, str(src_path), "--sqlite-cache", "--config-file", CONFIG_FILE, *settings, "--verbose", "--output=json"],
+            # [mypy_path, str(src_path), "--sqlite-cache", "--config-file", CONFIG_FILE, *settings, "--verbose", "--output=json"],
+            [sys.executable, "-m", "mypy", str(src_path), "--sqlite-cache", "--config-file", CONFIG_FILE, *settings, "--verbose", "--output=json"],
             capture_output=True,
             text=True,
             check=False,

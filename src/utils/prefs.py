@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 03.04.2025 20:50
+    © Jürgen Schoenemeyer, 11.05.2025 12:16
 
     src/utils/prefs.py
 
@@ -9,9 +9,16 @@
       - Prefs.load(pref_name: str) -> bool
       - Prefs.get(key_path: str) -> Any
 
+     - get_pref_special(pref_path: Path, pref_prefix: str, pref_name: str, key: str) -> str
+     - read_pref(pref_path: Path, pref_name: str) -> Tuple[bool, Dict[Any, Any]]
+     - beautify_path(path: Path | str) -> str
+     - merge_dicts(a: Dict[Any, Any], b: Dict[Any, Any]) -> Any
+     - beautify_path(path: Path | str) -> str
+
     PRIVATE:
-     - merge_dicts(a: Dict, b: Dict) -> Dict
-     - build_tree(tree: List, in_key: str, value: str) -> Dict
+     - merge_dicts(a: Dict[Any, Any], b: Dict[Any, Any]) -> Any
+     - deep_merge(dict1: Dict[Any, Any], dict2: Dict[Any, Any]) -> Dict[Any, Any]
+     - build_tree(tree: List[str], in_key: str, value: str) -> Dict[str, Any]
 """
 from __future__ import annotations
 
@@ -20,7 +27,7 @@ import re
 
 from json import JSONDecodeError
 from pathlib import Path
-from typing import Any, ClassVar, Dict, List, Tuple
+from typing import Any, ClassVar, Dict, List, Mapping, Tuple
 
 import yaml
 
@@ -55,15 +62,21 @@ class Prefs:
             with (cls.pref_path / pref_name).open(mode="r", encoding="utf-8") as file:
                 data = yaml.safe_load(file)
 
-            cls.data = dict(merge_dicts(cls.data, data))
-            # cls.data = merge(dict(cls.data), data) # -> Exception: Conflict at trainingCompany
-
-        except yaml.YAMLError as e:
+        except (yaml.YAMLError) as e:
             Trace.fatal(f"YAMLError '{pref_name}':\n{e}")
             return False
-
         except OSError as e:
-            Trace.error(f"{pref_name}: {e}")
+            Trace.fatal(f"{pref_name}: {e}")
+            return False
+
+        # add/merge to existing settings
+
+        try:
+            # cls.data = dict(merge_dicts(cls.data, data))
+            cls.data = deep_merge(cls.data, data)
+
+        except (AttributeError) as e:
+            Trace.fatal(f"AttributeError '{pref_name}': {e}")
             return False
 
         return True
@@ -121,9 +134,9 @@ class Prefs:
         return ret
 
 
-def get_pref_special(pref_path: Path, pref_prexix: str, pref_name: str, key: str) -> str:
+def get_pref_special(pref_path: Path, pref_prefix: str, pref_name: str, key: str) -> str:
     try:
-        path = pref_path / pref_prexix / (pref_name + ".yaml")
+        path = pref_path / pref_prefix / (pref_name + ".yaml")
         with path.open(mode="r", encoding="utf-8") as file:
             pref = yaml.safe_load(file)
 
@@ -175,6 +188,23 @@ def merge_dicts(a: Dict[Any, Any], b: Dict[Any, Any]) -> Any:
             yield (k, a[k])
         else:
             yield (k, b[k])
+
+def deep_merge(a: Dict[Any, Any], b: Mapping[Any, Any]) -> Dict[Any, Any]:
+    merged = a.copy()
+    for key, value in b.items():
+
+        if key in merged and isinstance(merged[key], list):
+            for item in value:
+                if item not in merged[key]:
+                    merged[key].append(item)
+
+        elif key in merged and isinstance(merged[key], Mapping) and isinstance(value, Mapping):
+            merged[key] = deep_merge(merged[key], value)
+
+        else:
+            merged[key] = value
+
+    return merged
 
 # https://stackoverflow.com/questions/7204805/deep-merge-dictionaries-of-dictionaries-in-python?page=1&tab=scoredesc#answer-7205107
 
