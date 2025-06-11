@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 07.04.2025 20:00
+    © Jürgen Schoenemeyer, 11.06.2025 23:38
 
     src/helper/analyse.py
 
@@ -103,17 +103,22 @@ def analyse_data(data: Dict[str, Any], name: str = "", fource_language: str = ""
 
     languages_skipped = set()
     for format in formats:
-        protokoll = format["protocol"]
-        if protokoll in {"mhtml", "m3u8_native"}:
-            continue
-
-        if protokoll != "https":
-            Trace.error(f"unknown protokoll '{protokoll}'")
-
         id = format["format_id"]
 
         acodec = format.get("acodec", "none")
         vcodec = format.get("vcodec", "none")
+
+        if acodec == "none" and vcodec == "none":
+            continue
+
+        protokoll = format["protocol"]
+        if protokoll in {"mhtml", "m3u8_native", "http_dash_segments"}:
+            Trace.info(f"skip '{protokoll}'")
+            continue
+
+        if protokoll != "https":
+            Trace.error(f"unknown protokoll '{protokoll}' - expected 'https'")
+            continue
 
         # Audio + Video -> low quality
 
@@ -157,8 +162,8 @@ def analyse_data(data: Dict[str, Any], name: str = "", fource_language: str = ""
                 "pref":     lang_pref,
                 "tbr":      round(format["tbr"]),
                 "quality":  round(format["quality"]),
-                "channels": format["audio_channels"],
-                "sampling": format["asr"],
+                "channels": format.get("audio_channels", 0),
+                "sampling": format.get("asr", 0),
                 "filesize": format.get("filesize"),
             }
 

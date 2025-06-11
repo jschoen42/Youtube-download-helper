@@ -2,8 +2,9 @@ youtube-download-helper v0.1.3
 ├── click v8.2.1
 │   └── colorama v0.4.6
 ├── pyyaml v6.0.2
-├── yt-dlp v2025.5.22
-├── mypy v1.15.0 (group: dev)
+├── yt-dlp v2025.6.9
+├── mypy v1.16.0 (group: dev)
 │   ├── mypy-extensions v1.1.0
-│   └── typing-extensions v4.13.2
+│   ├── pathspec v0.12.1
+│   └── typing-extensions v4.14.0
 └── types-pyyaml v6.0.12.20250516 (group: dev)

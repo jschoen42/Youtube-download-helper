@@ -2,7 +2,7 @@
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.expand": false,
   "explorer.fileNesting.patterns": {
-    "pyproject.toml": "ruff.toml, requirements.txt, uv.lock, .git*, README.md, LICENSE, __licenses.txt, .python-version, __package_tree*, __outdated.txt, .Python31*, .windsurfrules, .timestamps.json"
+    "pyproject.toml": "ruff.toml, requirements.txt, uv.lock, .git*, README.md, LICENSE, __licenses.txt, .ignore, .python-version, __package_tree*, __outdated.txt, .Python31*, .windsurfrules, .timestamps.json"
   },
 
   "terminal.integrated.fontFamily": "Consolas Nerd Font",
