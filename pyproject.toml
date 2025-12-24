@@ -1,6 +1,6 @@
 [project]
 name = "youtube-download-helper"
-version = "0.1.4"
+version = "0.1.6"
 description = "..."
 authors = [
     { name = "Jürgen Schoenemeyer", email = "js007@web.de" },
@@ -10,15 +10,15 @@ readme = "README.md"
 requires-python = ">=3.13"
 
 dependencies = [
-    "click>=8.1.8",
-    "pyyaml>=6.0.2",
-    "yt-dlp>=2025.3.26",
+    "click>=8.3.1",
+    "pyyaml>=6.0.3",
+    "yt-dlp>=2025.12.8",
 ]
 
 [dependency-groups]
 dev = [
-    "mypy>=1.15.0",
-    "types-pyyaml>=6.0.12.20250402",
+    "mypy>=1.19.0",
+    "types-pyyaml>=6.0.12.20250915",
 ]
 
 [tool.basedpyright]

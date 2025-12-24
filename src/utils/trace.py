@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 07.04.2025 20:30
+    © Jürgen Schoenemeyer, 24.12.2025 22:20
 
     src/utils/trace.py
 
@@ -127,21 +127,38 @@ pattern: Dict[str, str] = {
     "unknown":   " ??? ",
 }
 
+
+# G:\Python\Decide\websites-scan\src       -> G:/Python/Decide/websites-scan/src
+# \\Nuc5\g\Python\Decide\websites-scan\src -> G:/Python/Decide/websites-scan/src
+
+def normalize_path(path: str | Path) -> str:
+    path = str(path).replace("\\", "/")
+
+    if path.startswith("//"):
+        trimmed = path[2:]
+        parts = trimmed.split("/")
+        if len(parts) >= 2:
+            drive_letter = parts[1].upper() + ":"
+            remaining_path = "/".join(parts[2:])
+            return f"{drive_letter}/{remaining_path}"
+
+    return path
+
 class Trace:
     BASE_PATH: Path = Path(sys.argv[0]).parent
 
     default_base: Path = BASE_PATH.resolve()
-    default_base_folder: str = str(default_base).replace("\\", "/")
+    default_base_folder: str = normalize_path(str(default_base))
 
     settings: ClassVar[Dict[str, Any]] = {
         "appl_folder":    default_base_folder + "/",
 
         "color":          True,
         "reduced_mode":   False,
-        "debug_mode":     False,
+        "debug_mode":     True, # False,
 
         "show_timestamp": True,
-        "timezone":       True,
+        "timezone":       False,
 
         "show_caller":    True,
     }
@@ -179,91 +196,91 @@ class Trace:
     # info, update, download (not in reduced mode)
 
     @classmethod
-    def info(cls, message: str = "", *optional: Any) -> None:
+    def info(cls, message: str = "", *optional: Any, stacklevel: int = 2) -> None:
         if not cls.settings["reduced_mode"]:
-            pre = f"{cls._get_time()}{cls._get_pattern()}{cls._get_caller()}"
+            pre = f"{cls._get_time()}{cls._get_pattern()}{cls._get_caller(stacklevel)}"
             cls._show_message(cls._check_file_output(), pre, message, *optional)
 
     @classmethod
-    def update(cls, message: str = "", *optional: Any) -> None:
+    def update(cls, message: str = "", *optional: Any, stacklevel: int = 2) -> None:
         if not cls.settings["reduced_mode"]:
-            pre = f"{cls._get_time()}{cls._get_pattern()}{cls._get_caller()}"
+            pre = f"{cls._get_time()}{cls._get_pattern()}{cls._get_caller(stacklevel)}"
             cls._show_message(cls._check_file_output(), pre, message, *optional)
 
     @classmethod
-    def download(cls, message: str = "", *optional: Any) -> None:
+    def download(cls, message: str = "", *optional: Any, stacklevel: int = 2) -> None:
         if not cls.settings["reduced_mode"]:
-            pre = f"{cls._get_time()}{cls._get_pattern()}{cls._get_caller()}"
+            pre = f"{cls._get_time()}{cls._get_pattern()}{cls._get_caller(stacklevel)}"
             cls._show_message(cls._check_file_output(), pre, message, *optional)
 
     # action, result
 
     @classmethod
-    def action(cls, message: str = "", *optional: Any) -> None:
-        pre = f"{cls._get_time()}{cls._get_pattern()}{cls._get_caller()}"
+    def action(cls, message: str = "", *optional: Any, stacklevel: int = 2) -> None:
+        pre = f"{cls._get_time()}{cls._get_pattern()}{cls._get_caller(stacklevel)}"
         cls._show_message(cls._check_file_output(), pre, message, *optional)
 
     @classmethod
-    def result(cls, message: str = "", *optional: Any) -> None:
-        pre = f"{cls._get_time()}{cls._get_pattern()}{cls._get_caller()}"
+    def result(cls, message: str = "", *optional: Any, stacklevel: int = 2) -> None:
+        pre = f"{cls._get_time()}{cls._get_pattern()}{cls._get_caller(stacklevel)}"
         cls._show_message(cls._check_file_output(), pre, message, *optional)
 
     # important => text MAGENTA, BOLD
 
     @classmethod
-    def important(cls, message: str = "", *optional: Any) -> None:
-        pre = f"{cls._get_time()}{Color.MAGENTA}{cls._get_pattern()}{cls._get_caller()}"
+    def important(cls, message: str = "", *optional: Any, stacklevel: int = 2) -> None:
+        pre = f"{cls._get_time()}{Color.MAGENTA}{cls._get_pattern()}{cls._get_caller(stacklevel)}"
         cls._show_message(cls._check_file_output(), pre, f"{Color.MAGENTA}{Color.BOLD}{message}{Color.RESET}", *optional)
 
     # warning, error, exception, fatal => RED
 
     @classmethod
-    def warning(cls, message: str = "", *optional: Any) -> None:
-        pre = f"{cls._get_time()}{cls._get_pattern()}{cls._get_caller()}"
+    def warning(cls, message: str = "", *optional: Any, stacklevel: int = 2) -> None:
+        pre = f"{cls._get_time()}{cls._get_pattern()}{cls._get_caller(stacklevel)}"
         cls._show_message(cls._check_file_output(), pre, message, *optional)
 
     @classmethod
-    def error(cls, message: str = "", *optional: Any) -> None:
-        pre = f"{cls._get_time()}{Color.RED}{cls._get_pattern()}{cls._get_caller()}"
+    def error(cls, message: str = "", *optional: Any, stacklevel: int = 2) -> None:
+        pre = f"{cls._get_time()}{Color.RED}{cls._get_pattern()}{cls._get_caller(stacklevel)}"
         cls._show_message(cls._check_file_output(), pre, message, *optional)
 
     @classmethod
-    def exception(cls, message: str = "", *optional: Any) -> None:
-        pre = f"{cls._get_time()}{Color.RED}{cls._get_pattern()}{cls._get_caller()}"
+    def exception(cls, message: str = "", *optional: Any, stacklevel: int = 2) -> None:
+        pre = f"{cls._get_time()}{Color.RED}{cls._get_pattern()}{cls._get_caller(stacklevel)}"
         cls._show_message(cls._check_file_output(), pre, message, *optional)
 
     @classmethod
-    def fatal(cls, message: str = "", *optional: Any) -> None:
-        pre = f"{cls._get_time()}{Color.RED}{Color.BOLD}{cls._get_pattern()}{cls._get_caller()}"
+    def fatal(cls, message: str = "", *optional: Any, stacklevel: int = 2) -> None:
+        pre = f"{cls._get_time()}{Color.RED}{Color.BOLD}{cls._get_pattern()}{cls._get_caller(stacklevel)}"
         cls._show_message(cls._check_file_output(), pre, message, *optional)
         raise SystemExit
 
     # debug, wait (only in debug mode)
 
     @classmethod
-    def debug(cls, message: str = "", *optional: Any) -> None:
+    def debug(cls, message: str = "", *optional: Any, stacklevel: int = 2) -> None:
         if cls.settings["debug_mode"] and not cls.settings["reduced_mode"]:
-            pre = f"{cls._get_time()}{cls._get_pattern()}{cls._get_caller()}"
+            pre = f"{cls._get_time()}{cls._get_pattern()}{cls._get_caller(stacklevel)}"
             cls._show_message(cls._check_file_output(), pre, message, *optional)
 
     @classmethod
-    def wait(cls, message: str = "", *optional: Any) -> None:
+    def wait(cls, message: str = "", *optional: Any, stacklevel: int = 2) -> None:
         if cls.settings["debug_mode"]:
-            pre = f"{cls._get_time()}{cls._get_pattern()}{cls._get_caller()}"
+            pre = f"{cls._get_time()}{cls._get_pattern()}{cls._get_caller(stacklevel)}"
             cls._show_message(cls._check_file_output(), pre, message, *optional)
             try:
                 print(f"{Color.RED}{Color.BOLD} >>> Press Any key to continue or ESC to exit <<< {Color.RESET}", end="", flush=True)  # noqa: T201
 
                 if platform.system() == "Windows":
-                    import msvcrt
+                    import msvcrt  # noqa: PLC0415
 
                     key = msvcrt.getch()                      # type: ignore[attr-defined, reportAttributeAccessIssue] # -> Linux
                     print()  # noqa: T201
 
                 else: # unix terminal
 
-                    import termios
-                    import tty
+                    import termios  # noqa: I001, PLC0415
+                    import tty  # noqa: PLC0415
 
                     fd: int = sys.stdin.fileno()
                     old_settings: Any = termios.tcgetattr(fd)  # type: ignore[attr-defined, reportAttributeAccessIssue] # -> Windows
@@ -275,7 +292,7 @@ class Trace:
                             fd,
                             termios.TCSADRAIN,                 # type: ignore[attr-defined, reportAttributeAccessIssue] # -> Windows
                             old_settings,
-                       )
+                        )
                         print()  # noqa: T201
 
                 if key == b"\x1b":
@@ -393,37 +410,44 @@ class Trace:
 
         return pattern["unknown"]      # should never happens
 
-    # [utils/file.py:413 » export_file]
+    # stacklevel = 1
+    #  -> [utils/trace.py:203 » action()] Python version 3.13.5 (main, Jun 12 2025, 12:42:35) [MSC v.1943 64 bit (AMD64)]
+    #  -> [utils/trace.py:203 » action()] [complete]: img -> vital-hotel-adt.de
+    #  -> [utils/trace.py:203 » action()] scan images vital-hotel-adt.de / []
+    #  -> [utils/trace.py:184 » info()] image/png: ...
+
+    # stacklevel = 2 (default)
+    #  -> [main.py:446] Python version 3.13.5 (main, Jun 12 2025, 12:42:35) [MSC v.1943 64 bit (AMD64)]
+    #  -> [main.py:295 » main()] [complete]: img -> vital-hotel-adt.de
+    #  -> [worker/images.py:047 » analyse_files_img()] scan images vital-hotel-adt.de / []
+    #  -> [utils/web_helper.py:173 » requests_head()] image/png: ...
+
+    # stacklevel = 3
+    #  -> [stacklevel error]
+    #  -> [main.py:449] [complete]: img -> vital-hotel-adt.de
+    #  -> [main.py:297 » main()] scan images vital-hotel-adt.de / []
+    #  -> [worker/images.py:114 » analyse_files_img()] image/png: ...
 
     @classmethod
-    def _get_caller(cls) -> str:
+    def _get_caller(cls, stacklevel: int) -> str:
         if cls.settings["show_caller"] is False:
             return f"{Color.RESET} "
 
-        path = inspect.stack()[2][1].replace("\\", "/")
+        try:
+            stack = inspect.stack()
+            frame_info = stack[stacklevel]
+        except IndexError:
+            return f"\t{Color.RED}[stacklevel error]{Color.RESET}\t"
+
+        path = frame_info.filename.replace("\\", "/")
         path = path.split(cls.settings["appl_folder"])[-1]
+        line_no = str(frame_info.lineno).zfill(3)
 
-        current_frame: FrameType | None = inspect.currentframe()
-        if current_frame is None:
-            return ""
-
-        caller_frame: FrameType | None = current_frame.f_back
-        if caller_frame is None:
-            return ""
-
-        trace_frame: FrameType | None = caller_frame.f_back
-        if trace_frame is None:
-            return ""
-
-        line_no = str(trace_frame.f_lineno).zfill(3)
-
-        caller = trace_frame.f_code.co_qualname
-        caller = caller.replace(".<locals>.", " → ")
-
+        caller = frame_info.function
         if caller == "<module>":
             return f"\t{Color.BLUE}[{path}:{line_no}]{Color.RESET}\t"
         else:
-            return f"\t{Color.BLUE}[{path}:{line_no} » {caller}]{Color.RESET}\t"
+            return f"\t{Color.BLUE}[{path}:{line_no} » {caller}()]{Color.RESET}\t"
 
     @classmethod
     def _get_decorator_caller(cls, text: str) -> str:

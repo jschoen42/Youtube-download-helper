@@ -7,14 +7,16 @@ data/*
 wav/*
 !wav/.gitkeep
 
-_history/*
-_trace*/*
-_old/*
+.idea/
 
-/temp/*
+_history/
+_trace*/
+_old/
 
-.mypy_cache/*
-.type-check-result/*
+/temp/
+
+.mypy_cache/
+.type-check-result/
 
 .Python31?-*
 

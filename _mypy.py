@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 11.05.2025 12:16
+    © Jürgen Schoenemeyer, 29.07.2025 07:53
 
     _mypy.py
 
@@ -130,7 +130,7 @@ def check_types(src_path: Path, python_version: str) -> None:
         # "--disallow-any-expr",          # default: False
         # "--disallow-any-decorated",     # default: False
         # "--disallow-any-explicit",      # default: False
-        # "--disallow-any-generics",      # default: False (-> strict mode)
+        "--disallow-any-generics",        # default: False (-> strict mode)
         # "--disallow-subclassing-any",   # default: False (-> strict mode)
 
         ### Untyped definitions and calls
@@ -176,7 +176,6 @@ def check_types(src_path: Path, python_version: str) -> None:
         # "--pretty",                     # default: False
         # "--error-summary",              # default: True
         # "--show-absolute-path",         # default: False
-        "--force-uppercase-builtins",     # default: False
         # "--force-union-syntax",         # default: False
 
         ### Advanced options
@@ -267,7 +266,6 @@ def check_types(src_path: Path, python_version: str) -> None:
         # https://mypy.readthedocs.io/en/stable/command_line.html
 
         result = subprocess.run(
-            # [mypy_path, str(src_path), "--sqlite-cache", "--config-file", CONFIG_FILE, *settings, "--verbose", "--output=json"],
             [sys.executable, "-m", "mypy", str(src_path), "--sqlite-cache", "--config-file", CONFIG_FILE, *settings, "--verbose", "--output=json"],
             capture_output=True,
             text=True,

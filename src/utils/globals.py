@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 20.03.2025 15:30
+    © Jürgen Schoenemeyer, 26.06.2025 18:14
 
     src/utils/globals.py
 
@@ -19,7 +19,7 @@ from typing import List
 
 DRIVE = Path(Path(__file__).drive)
 ROOT = Path(Path(__file__).root)
-BASE_PATH = Path(sys.argv[0]).parent.parent
+BASE_PATH = Path(sys.argv[0]).resolve().parent.parent
 
 system_paths = os.getenv("PATH")
 if system_paths is None:

@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 31.03.2025 23:52
+    © Jürgen Schoenemeyer, 29.07.2025 07:53
 
     _pyright.py
 
@@ -85,6 +85,7 @@ def check_types(src_path: Path, python_version: str) -> None:
         "reportUnknownArgumentType":  False,
         "reportUnknownMemberType":    False,
         "reportUnknownVariableType":  False,
+        "reportUnknownLambdaType":    False,
 
         # extra rules
         "enableExperimentalFeatures":          True,
@@ -101,6 +102,9 @@ def check_types(src_path: Path, python_version: str) -> None:
 
         "deprecateTypingAliases": False,       # always False -> typing: List, Dict, ...
         "reportUnusedCallResult": False,       # always False -> _vars
+
+        "reportUnusedVariable": False,
+        "reportUnusedImport": False,
 
         "exclude": [
             "**/.venv",

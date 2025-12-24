@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 12.04.2025 18:38
+    © Jürgen Schoenemeyer, 24.12.2025 22:39
 
     src/helper/youtube.py
 
@@ -42,8 +42,7 @@ def download_video(youtube_id: str, path: Path | str, audio_only: bool, force_la
         "quiet": True,
         "force-ipv6": True,
         "debug_printtraffic": debug,
-
-        # "outtmpl": str(path) + "/%(uploader)s/%(title)s.%(ext)s",
+        "remote_components": ["ejs:npm"], # "--remote-components ejs:npm"
     }
 
     # step 1: audio/video title and available tracks
@@ -111,16 +110,8 @@ def download_video(youtube_id: str, path: Path | str, audio_only: bool, force_la
             else:
                 format = f"{video_id}+{audio_id}"
 
-        yt_opts = {
-            "extract_audio": audio_only,
-            "verbose":       False,
-            "quiet":         True,
-            "force-ipv6":    True,
-            "format":        format,
-            "outtmpl":       str(path) + f"/%(uploader)s/{title} ({format}).%(ext)s",
-
-            # "debug_printtraffic": True,
-        }
+        yt_opts["extract_audio"] = audio_only
+        yt_opts["outtmpl"] = str(path) + f"/%(uploader)s/{title} ({format}).%(ext)s"
 
         Trace.result( f"{time.time() - start_time:.2f} sec => '{title}' ({format})" )
 
