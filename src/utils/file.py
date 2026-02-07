@@ -67,7 +67,7 @@ from re import Match
 from typing import Any, Dict, List, Tuple
 
 # utils
-from utils.trace import Trace, normalize_path
+from src.utils.trace import Trace, normalize_path
 
 # timestamp
 
@@ -104,7 +104,10 @@ def check_file_exists(filepath_start: Path | str, filepath_end: Path | str) -> b
     # "/dir1" + "/dir2/dir3/file.ext"
     # "" + "/dir1/dir2/dir3/file.ext"
 
-    full_path = Path(filepath_start) / filepath_end
+    if filepath_end == "":
+        full_path = Path(filepath_start)
+    else:
+        full_path = Path(filepath_start) / filepath_end
 
     filepath = full_path.parent
     filename = full_path.name

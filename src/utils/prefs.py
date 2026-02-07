@@ -32,8 +32,8 @@ from typing import Any, ClassVar, Dict, List, Mapping, Tuple
 import yaml
 
 # utils
-from utils.globals import BASE_PATH
-from utils.trace import Trace
+from src.utils.globals import BASE_PATH
+from src.utils.trace import Trace
 
 class Prefs:
     pref_path: Path = BASE_PATH / "prefs"

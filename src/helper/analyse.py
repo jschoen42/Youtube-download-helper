@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 11.06.2025 23:38
+    © Jürgen Schoenemeyer, 07.02.2026 21:23
 
     src/helper/analyse.py
 
@@ -50,8 +50,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict
 
-from utils.file import import_json, listdir_match_extention
-from utils.trace import Trace
+# utils
+from src.utils.file import import_json, listdir_match_extention
+from src.utils.trace import Trace
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -199,7 +200,7 @@ def analyse_data(data: Dict[str, Any], name: str = "", fource_language: str = ""
     video_best = {}
     for type, value in videos.items(): # -> last entry
         last    = list(value)[-1]
-        quality = videos[type][last]["quality"]
+        quality = value[last]["quality"]
         video_best[type] = [last, quality]
 
     # all available audio tracks

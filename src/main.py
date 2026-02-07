@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 24.05.2025 19:51
+    © Jürgen Schoenemeyer, 07.02.2026 21:21
 
     src/main.py
 
@@ -14,10 +14,13 @@ import sys
 
 import click
 
-from helper.youtube import download_video
-from utils.globals import BASE_PATH
-from utils.prefs import Prefs
-from utils.trace import Trace
+# helper
+from src.helper.youtube import download_video
+
+# utils
+from src.utils.globals import BASE_PATH
+from src.utils.prefs import Prefs
+from src.utils.trace import Trace
 
 DEST_VIDEO = BASE_PATH / "data" / "video"
 DEST_AUDIO = BASE_PATH / "data" / "audio"

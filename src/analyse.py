@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 12.04.2025 18:38
+    © Jürgen Schoenemeyer, 07.02.2026 21:21
 
     src/utils/analyse.py
 
@@ -16,9 +16,12 @@ import sys
 
 import click
 
-from helper.analyse import analyse_json_all
-from utils.globals import BASE_PATH
-from utils.trace import Trace
+# helper
+from src.helper.analyse import analyse_json_all
+
+# utils
+from src.utils.globals import BASE_PATH
+from src.utils.trace import Trace
 
 TEST_DIR = BASE_PATH / "test" / "data"
 

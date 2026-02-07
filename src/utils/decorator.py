@@ -24,7 +24,7 @@ from inspect import BoundArguments, Signature
 from typing import TYPE_CHECKING, Any, Dict, Generator, Match, Tuple
 
 # utils
-from utils.trace import Color, Trace
+from src.utils.trace import Color, Trace
 
 if TYPE_CHECKING:
     from collections.abc import Callable

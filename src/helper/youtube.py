@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 24.12.2025 22:39
+    © Jürgen Schoenemeyer, 07.02.2026 21:18
 
     src/helper/youtube.py
 
@@ -20,10 +20,13 @@ import yt_dlp  # type: ignore[import-untyped]
 
 from yt_dlp.utils import DownloadError  # type: ignore[import-untyped]
 
-from helper.analyse import analyse_data
-from utils.file import export_json
-from utils.prefs import Prefs
-from utils.trace import Color, Trace
+# helper
+from src.helper.analyse import analyse_data
+
+# utils
+from src.utils.file import export_json
+from src.utils.prefs import Prefs
+from src.utils.trace import Color, Trace
 
 # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/YoutubeDL.py#L128-L278
 

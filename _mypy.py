@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 29.07.2025 07:53
+    © Jürgen Schoenemeyer, 05.01.2026 13:24
 
     _mypy.py
 
@@ -56,7 +56,7 @@ CONFIG_FILE = "_mypy.tmp.toml"
 CONFIG = \
 """
 [tool.mypy]
-mypy_path = "src"
+mypy_path = "."
 python_version = "[version]"
 exclude = [
     "/extras/*",
